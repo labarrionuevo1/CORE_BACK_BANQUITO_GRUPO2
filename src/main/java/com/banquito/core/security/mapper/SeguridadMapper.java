@@ -7,11 +7,32 @@ import com.banquito.core.security.model.UsuarioCore;
 
 public final class SeguridadMapper {
     private SeguridadMapper() {}
+    
     public static CredencialWebResponse toResponse(CredencialWeb c) {
-        return new CredencialWebResponse(c.getId(), c.getCliente().getId(), c.getUsuario(), c.getEstado());
+        Integer clienteId = c.getCliente() != null ? c.getCliente().getId() : null;
+        return new CredencialWebResponse(
+                c.getId(), 
+                clienteId, 
+                c.getUsuario(), 
+                c.getEstado(),
+                c.getUltimoLogin(),
+                c.getFechaCreacion(),
+                c.getFechaActualizacion()
+        );
     }
+    
     public static UsuarioCoreResponse toResponse(UsuarioCore u) {
-        Integer sucursalId = u.getSucursal() == null ? null : u.getSucursal().getId();
-        return new UsuarioCoreResponse(u.getId(), sucursalId, u.getUsuario(), u.getNombreCompleto(), u.getRol(), u.getEstado());
+        Integer sucursalId = u.getSucursal() != null ? u.getSucursal().getId() : null;
+        return new UsuarioCoreResponse(
+                u.getId(), 
+                sucursalId, 
+                u.getUsuario(), 
+                u.getNombreCompleto(), 
+                u.getRol(), 
+                u.getEstado(),
+                u.getUltimoLogin(),
+                u.getFechaCreacion(),
+                u.getFechaActualizacion()
+        );
     }
 }
