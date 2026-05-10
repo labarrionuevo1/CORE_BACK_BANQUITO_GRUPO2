@@ -2,6 +2,7 @@ com\banquito\core\branches\controller\SucursalController.class
 com\banquito\core\accounts\dto\request\CrearCuentaRequest.class
 com\banquito\core\transactions\dto\response\TransferenciaResponse.class
 com\banquito\core\branches\mapper\SucursalMapper.class
+com\banquito\core\shared\exception\AccountNotActiveException.class
 com\banquito\core\accounts\repository\BloqueoCuentaRepository.class
 com\banquito\core\transactions\model\SubtipoTransaccion.class
 com\banquito\core\accounts\model\SubtipoCuenta.class
@@ -33,7 +34,9 @@ com\banquito\core\audit\mapper\AuditoriaMapper.class
 com\banquito\core\security\enums\EstadoCredencialWebEnum.class
 com\banquito\core\customers\enums\TipoIdentificacionEnum.class
 com\banquito\core\institutional\repository\CuentaInstitucionalRepository.class
+com\banquito\core\shared\exception\DuplicateResourceException.class
 com\banquito\core\parameters\repository\ParametroCoreRepository.class
+com\banquito\core\shared\exception\InsufficientFundsException.class
 com\banquito\core\branches\service\SucursalService.class
 com\banquito\core\institutional\enums\EstadoCuentaInstitucionalEnum.class
 com\banquito\core\shared\enums\CanalOrigenEnum.class
@@ -55,6 +58,7 @@ com\banquito\core\integration\switchapi\dto\request\LiquidacionServicioSwitchReq
 com\banquito\core\institutional\mapper\CuentaInstitucionalMapper.class
 com\banquito\core\accounts\model\BloqueoCuenta.class
 com\banquito\core\integration\switchapi\dto\response\LiquidacionServicioSwitchResponse.class
+com\banquito\core\shared\exception\IdempotencyException.class
 com\banquito\core\audit\enums\ResultadoAuditoriaEnum.class
 com\banquito\core\shared\exception\ResourceNotFoundException.class
 com\banquito\core\transactions\enums\EstadoTransaccionEnum.class
@@ -95,6 +99,7 @@ com\banquito\core\security\enums\RolUsuarioCoreEnum.class
 com\banquito\core\branches\model\Sucursal.class
 com\banquito\core\shared\enums\EstadoCatalogoEnum.class
 com\banquito\core\institutional\model\CuentaInstitucional.class
+com\banquito\core\shared\exception\ValidationException.class
 com\banquito\core\parameters\enums\TipoDatoParametroEnum.class
 com\banquito\core\security\model\CredencialWeb.class
 com\banquito\core\parameters\model\ParametroCore.class

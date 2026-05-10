@@ -5,8 +5,8 @@ import com.banquito.core.accounts.model.Cuenta;
 import com.banquito.core.accounts.repository.CuentaRepository;
 import com.banquito.core.institutional.repository.CuentaInstitucionalRepository;
 import com.banquito.core.shared.enums.CanalOrigenEnum;
-import com.banquito.core.shared.exception.BusinessException;
-import com.banquito.core.shared.exception.ResourceNotFoundException;
+import com.banquito.core.shared.exception.*;
+import lombok.extern.slf4j.Slf4j;
 import com.banquito.core.transactions.dto.request.TransferenciaRequest;
 import com.banquito.core.transactions.dto.response.TransferenciaResponse;
 import com.banquito.core.transactions.enums.EstadoTransaccionEnum;
@@ -27,6 +27,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MotorTransaccionalService {
     private final CuentaRepository cuentaRepository;
     private final SubtipoTransaccionRepository subtipoRepository;
@@ -36,13 +37,32 @@ public class MotorTransaccionalService {
 
     @Transactional
     public TransferenciaResponse ejecutarTransferencia(TransferenciaRequest request) {
-        Cuenta origen = cuentaRepository.findByNumeroCuenta(request.cuentaOrigen()).orElseThrow(() -> new ResourceNotFoundException("Cuenta origen no encontrada"));
-        Cuenta destino = cuentaRepository.findByNumeroCuenta(request.cuentaDestino()).orElseThrow(() -> new ResourceNotFoundException("Cuenta destino no encontrada"));
-        if (origen.getEstado() != EstadoCuentaEnum.ACTIVA) throw new BusinessException("Cuenta origen no activa");
-        if (destino.getEstado() != EstadoCuentaEnum.ACTIVA) throw new BusinessException("Cuenta destino no activa para pago masivo");
+        log.info("Ejecutando transferencia: {} -> {} por {}", request.cuentaOrigen(), request.cuentaDestino(), request.monto());
+        
+        Cuenta origen = cuentaRepository.findByNumeroCuenta(request.cuentaOrigen())
+            .orElseThrow(() -> new ResourceNotFoundException("Cuenta origen no encontrada: " + request.cuentaOrigen()));
+        Cuenta destino = cuentaRepository.findByNumeroCuenta(request.cuentaDestino())
+            .orElseThrow(() -> new ResourceNotFoundException("Cuenta destino no encontrada: " + request.cuentaDestino()));
+            
+        if (origen.getEstado() != EstadoCuentaEnum.ACTIVA) 
+            throw new AccountNotActiveException("Cuenta origen no está activa: " + request.cuentaOrigen());
+        if (destino.getEstado() != EstadoCuentaEnum.ACTIVA) 
+            throw new AccountNotActiveException("Cuenta destino no está activa para pago masivo: " + request.cuentaDestino());
+            
         BigDecimal saldoConSobregiro = origen.getSaldoDisponible().add(origen.getLimiteSobregiro());
-        if (saldoConSobregiro.compareTo(request.monto()) < 0) throw new BusinessException("Saldo insuficiente");
-        var subtipo = subtipoRepository.findByCodigo(request.codigoSubtipo()).orElseThrow(() -> new ResourceNotFoundException("Subtipo de transaccion no encontrado"));
+        if (saldoConSobregiro.compareTo(request.monto()) < 0) 
+            throw new InsufficientFundsException("Saldo insuficiente en cuenta " + request.cuentaOrigen() + 
+                ". Disponible: " + origen.getSaldoDisponible() + ", Monto: " + request.monto());
+                
+        var subtipo = subtipoRepository.findByCodigo(request.codigoSubtipo())
+            .orElseThrow(() -> new ResourceNotFoundException("Subtipo de transacción no encontrado: " + request.codigoSubtipo()));
+        
+        // RF-06: Validación de duplicidad UUID
+        LocalDate fechaNegocio = LocalDate.now();
+        if (transaccionCuentaRepository.existsByCuentaAndUuidTransaccionAndFechaNegocio(origen, request.uuidOperacion(), fechaNegocio)) {
+            throw new IdempotencyException("Transacción duplicada: UUID ya existe para esta cuenta en la fecha de negocio");
+        }
+        
         UUID grupo = request.uuidGrupoOperacion() != null ? request.uuidGrupoOperacion() : UUID.randomUUID();
         UUID uuidDebito = request.uuidOperacion();
         UUID uuidCredito = UUID.randomUUID();
@@ -55,7 +75,8 @@ public class MotorTransaccionalService {
         destino.setFechaUltimoMovimiento(LocalDateTime.now());
         cuentaRepository.save(origen);
         cuentaRepository.save(destino);
-        LocalDate fechaNegocio = LocalDate.now();
+        
+        // Registrar transacción de débito
         TransaccionCuenta transaccionDebito = new TransaccionCuenta();
         transaccionDebito.setCuenta(origen);
         transaccionDebito.setSubtipoTransaccion(subtipo);
@@ -71,6 +92,7 @@ public class MotorTransaccionalService {
         transaccionDebito.setDescripcion(request.descripcion());
         transaccionCuentaRepository.save(transaccionDebito);
 
+        // Registrar transacción de crédito
         TransaccionCuenta transaccionCredito = new TransaccionCuenta();
         transaccionCredito.setCuenta(destino);
         transaccionCredito.setSubtipoTransaccion(subtipo);
@@ -85,6 +107,10 @@ public class MotorTransaccionalService {
         transaccionCredito.setReferenciaExterna(request.referenciaExterna());
         transaccionCredito.setDescripcion(request.descripcion());
         transaccionCuentaRepository.save(transaccionCredito);
+        
+        log.info("Transferencia completada exitosamente. Débito: {}, Crédito: {}, Monto: {}", 
+            uuidDebito, uuidCredito, request.monto());
+            
         return new TransferenciaResponse("EXITOSA", uuidDebito, uuidCredito, grupo, origen.getSaldoDisponible());
     }
 

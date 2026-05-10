@@ -84,9 +84,14 @@ C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\
 C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\security\service\AuthService.java
 C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\shared\enums\CanalOrigenEnum.java
 C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\shared\enums\EstadoCatalogoEnum.java
+C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\shared\exception\AccountNotActiveException.java
 C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\shared\exception\BusinessException.java
+C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\shared\exception\DuplicateResourceException.java
 C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\shared\exception\GlobalExceptionHandler.java
+C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\shared\exception\IdempotencyException.java
+C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\shared\exception\InsufficientFundsException.java
 C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\shared\exception\ResourceNotFoundException.java
+C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\shared\exception\ValidationException.java
 C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\shared\response\ApiResponse.java
 C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\transactions\controller\TransaccionController.java
 C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\transactions\dto\request\TransferenciaRequest.java
@@ -94,6 +99,7 @@ C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\
 C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\transactions\dto\response\TransferenciaResponse.java
 C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\transactions\enums\EstadoTransaccionEnum.java
 C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\transactions\enums\TipoMovimientoEnum.java
+C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\transactions\mapper\TransaccionMapper.java
 C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\transactions\model\SubtipoTransaccion.java
 C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\transactions\model\TransaccionCuenta.java
 C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\transactions\model\TransaccionInstitucional.java
