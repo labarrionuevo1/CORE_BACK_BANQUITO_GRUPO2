@@ -9,7 +9,21 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/core/cuentas-institucionales")
 @RequiredArgsConstructor
 public class CuentaInstitucionalController {
+
     private final CuentaInstitucionalService service;
-    @GetMapping public ApiResponse<?> listar() { return ApiResponse.ok("Cuentas institucionales obtenidas", service.listar()); }
-    @GetMapping("codigo/{codigo}") public ApiResponse<?> porCodigo(@PathVariable String codigo) { return ApiResponse.ok("Cuenta institucional", service.porCodigo(codigo)); }
+
+    @GetMapping
+    public ApiResponse<?> listar() {
+        return ApiResponse.ok("Cuentas institucionales obtenidas", service.listar());
+    }
+
+    @GetMapping("/{numeroCuenta}")
+    public ApiResponse<?> porNumeroCuenta(@PathVariable String numeroCuenta) {
+        return ApiResponse.ok("Cuenta institucional obtenida", service.porNumeroCuenta(numeroCuenta));
+    }
+
+    @GetMapping("/codigo/{codigo}")
+    public ApiResponse<?> porCodigo(@PathVariable String codigo) {
+        return ApiResponse.ok("Cuenta institucional obtenida", service.porCodigo(codigo));
+    }
 }

@@ -1,8 +1,8 @@
 package com.banquito.core.shared.exception;
 
-import com.banquito.core.shared.response.ApiResponse;
+import com.banquito.core.shared.response.ErrorResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,76 +12,133 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.stream.Collectors;
 
-@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    
+
+        @ExceptionHandler(NotFoundException.class)
+        public ResponseEntity<ErrorResponse> handleNotFoundAlias(
+                NotFoundException ex,
+                HttpServletRequest request
+        ) {
+        return build(HttpStatus.NOT_FOUND, "RESOURCE_NOT_FOUND", ex.getMessage(), request);
+        }
+
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiResponse<Void>> handleNotFound(ResourceNotFoundException ex) {
-        log.warn("Recurso no encontrado: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.fail(ex.getMessage(), null));
+    public ResponseEntity<ErrorResponse> handleNotFound(
+            ResourceNotFoundException ex,
+            HttpServletRequest request
+    ) {
+        return build(HttpStatus.NOT_FOUND, "RESOURCE_NOT_FOUND", ex.getMessage(), request);
     }
-    
+
     @ExceptionHandler(DuplicateResourceException.class)
-    public ResponseEntity<ApiResponse<Void>> handleDuplicate(DuplicateResourceException ex) {
-        log.warn("Recurso duplicado: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.fail(ex.getMessage(), null));
+    public ResponseEntity<ErrorResponse> handleDuplicate(
+            DuplicateResourceException ex,
+            HttpServletRequest request
+    ) {
+        return build(HttpStatus.CONFLICT, "DUPLICATE_RESOURCE", ex.getMessage(), request);
     }
-    
+
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<ApiResponse<Void>> handleValidationException(ValidationException ex) {
-        log.warn("Error de validación: {}", ex.getMessage());
-        return ResponseEntity.badRequest().body(ApiResponse.fail(ex.getMessage(), null));
+    public ResponseEntity<ErrorResponse> handleValidationException(
+            ValidationException ex,
+            HttpServletRequest request
+    ) {
+        return build(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", ex.getMessage(), request);
     }
-    
+
     @ExceptionHandler(InsufficientFundsException.class)
-    public ResponseEntity<ApiResponse<Void>> handleInsufficientFunds(InsufficientFundsException ex) {
-        log.warn("Fondos insuficientes: {}", ex.getMessage());
-        return ResponseEntity.badRequest().body(ApiResponse.fail(ex.getMessage(), null));
+    public ResponseEntity<ErrorResponse> handleInsufficientFunds(
+            InsufficientFundsException ex,
+            HttpServletRequest request
+    ) {
+        return build(HttpStatus.BAD_REQUEST, "INSUFFICIENT_FUNDS", ex.getMessage(), request);
     }
-    
+
     @ExceptionHandler(AccountNotActiveException.class)
-    public ResponseEntity<ApiResponse<Void>> handleAccountNotActive(AccountNotActiveException ex) {
-        log.warn("Cuenta no activa: {}", ex.getMessage());
-        return ResponseEntity.badRequest().body(ApiResponse.fail(ex.getMessage(), null));
+    public ResponseEntity<ErrorResponse> handleAccountNotActive(
+            AccountNotActiveException ex,
+            HttpServletRequest request
+    ) {
+        return build(HttpStatus.BAD_REQUEST, "ACCOUNT_NOT_ACTIVE", ex.getMessage(), request);
     }
-    
+
     @ExceptionHandler(IdempotencyException.class)
-    public ResponseEntity<ApiResponse<Void>> handleIdempotency(IdempotencyException ex) {
-        log.warn("Error de idempotencia: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.fail(ex.getMessage(), null));
+    public ResponseEntity<ErrorResponse> handleIdempotency(
+            IdempotencyException ex,
+            HttpServletRequest request
+    ) {
+        return build(HttpStatus.CONFLICT, "IDEMPOTENCY_ERROR", ex.getMessage(), request);
     }
-    
+
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ApiResponse<Void>> handleBusiness(BusinessException ex) {
-        log.warn("Error de negocio: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.fail(ex.getMessage(), null));
+    public ResponseEntity<ErrorResponse> handleBusiness(
+            BusinessException ex,
+            HttpServletRequest request
+    ) {
+        return build(HttpStatus.CONFLICT, "BUSINESS_ERROR", ex.getMessage(), request);
     }
-    
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Void>> handleValidation(MethodArgumentNotValidException ex) {
-        String msg = ex.getBindingResult().getFieldErrors().stream()
-                .map(e -> e.getField() + ": " + e.getDefaultMessage())
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest request
+    ) {
+        String message = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.joining("; "));
-        log.warn("Error de validación de campos: {}", msg);
-        return ResponseEntity.badRequest().body(ApiResponse.fail(msg, null));
+
+        return build(HttpStatus.BAD_REQUEST, "FIELD_VALIDATION_ERROR", message, request);
     }
-    
+
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ApiResponse<Void>> handleConstraint(ConstraintViolationException ex) {
-        log.warn("Violación de constraint: {}", ex.getMessage());
-        return ResponseEntity.badRequest().body(ApiResponse.fail(ex.getMessage(), null));
+    public ResponseEntity<ErrorResponse> handleConstraintViolation(
+            ConstraintViolationException ex,
+            HttpServletRequest request
+    ) {
+        return build(HttpStatus.BAD_REQUEST, "CONSTRAINT_VIOLATION", ex.getMessage(), request);
     }
-    
+
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ApiResponse<Void>> handleDataIntegrity(DataIntegrityViolationException ex) {
-        log.error("Violación de integridad de datos: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.fail("Violación de integridad de datos", null));
+    public ResponseEntity<ErrorResponse> handleDataIntegrity(
+            DataIntegrityViolationException ex,
+            HttpServletRequest request
+    ) {
+        return build(
+                HttpStatus.CONFLICT,
+                "DATA_INTEGRITY_ERROR",
+                "Violación de integridad de datos",
+                request
+        );
     }
-    
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleGeneric(Exception ex) {
-        log.error("Error no controlado: ", ex);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.fail("Error interno del servidor", null));
+    public ResponseEntity<ErrorResponse> handleGeneric(
+            Exception ex,
+            HttpServletRequest request
+    ) {
+        return build(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "INTERNAL_SERVER_ERROR",
+                "Error interno del servidor",
+                request
+        );
+    }
+
+    private ResponseEntity<ErrorResponse> build(
+            HttpStatus status,
+            String code,
+            String message,
+            HttpServletRequest request
+    ) {
+        ErrorResponse response = ErrorResponse.of(
+                code,
+                message,
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(status).body(response);
     }
 }

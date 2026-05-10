@@ -1,114 +1,116 @@
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\accounts\controller\CuentaController.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\accounts\dto\request\BloquearCuentaRequest.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\accounts\dto\request\CambiarEstadoCuentaRequest.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\accounts\dto\request\CrearCuentaRequest.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\accounts\dto\response\CuentaResponse.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\accounts\dto\response\SaldoCuentaResponse.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\accounts\enums\EstadoBloqueoCuentaEnum.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\accounts\enums\EstadoCuentaEnum.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\accounts\enums\TipoBaseCuentaEnum.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\accounts\mapper\CuentaMapper.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\accounts\model\BloqueoCuenta.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\accounts\model\Cuenta.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\accounts\model\HistorialEstadoCuenta.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\accounts\model\SubtipoCuenta.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\accounts\repository\BloqueoCuentaRepository.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\accounts\repository\CuentaRepository.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\accounts\repository\HistorialEstadoCuentaRepository.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\accounts\repository\SubtipoCuentaRepository.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\accounts\service\CuentaService.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\audit\controller\AuditoriaController.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\audit\dto\response\AuditoriaEventoResponse.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\audit\enums\ResultadoAuditoriaEnum.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\audit\mapper\AuditoriaMapper.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\audit\model\AuditoriaEvento.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\audit\repository\AuditoriaEventoRepository.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\audit\service\AuditoriaService.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\branches\controller\SucursalController.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\branches\dto\request\SucursalRequest.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\branches\dto\response\SucursalResponse.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\branches\enums\EstadoSucursalEnum.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\branches\mapper\SucursalMapper.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\branches\model\Sucursal.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\branches\repository\SucursalRepository.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\branches\service\SucursalService.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\CoreApplication.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\customers\controller\ClienteController.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\customers\dto\request\ClienteRequest.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\customers\dto\response\ClienteResponse.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\customers\enums\EstadoClienteEnum.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\customers\enums\TipoClienteEnum.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\customers\enums\TipoIdentificacionEnum.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\customers\mapper\ClienteMapper.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\customers\model\Cliente.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\customers\model\SubtipoCliente.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\customers\repository\ClienteRepository.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\customers\repository\SubtipoClienteRepository.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\customers\service\ClienteService.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\institutional\controller\CuentaInstitucionalController.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\institutional\dto\response\CuentaInstitucionalResponse.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\institutional\enums\EstadoCuentaInstitucionalEnum.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\institutional\enums\TipoCuentaInstitucionalEnum.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\institutional\mapper\CuentaInstitucionalMapper.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\institutional\model\CuentaInstitucional.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\institutional\repository\CuentaInstitucionalRepository.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\institutional\service\CuentaInstitucionalService.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\integration\switchapi\controller\IntegracionSwitchController.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\integration\switchapi\dto\request\LiquidacionServicioSwitchRequest.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\integration\switchapi\dto\response\LiquidacionServicioSwitchResponse.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\integration\switchapi\dto\response\ValidarEmpresaSwitchResponse.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\integration\switchapi\service\IntegracionSwitchService.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\parameters\controller\FeriadoController.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\parameters\controller\ParametroCoreController.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\parameters\dto\response\FeriadoResponse.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\parameters\dto\response\ParametroCoreResponse.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\parameters\enums\TipoDatoParametroEnum.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\parameters\mapper\ParametroMapper.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\parameters\model\Feriado.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\parameters\model\ParametroCore.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\parameters\repository\FeriadoRepository.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\parameters\repository\ParametroCoreRepository.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\parameters\service\FeriadoService.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\parameters\service\ParametroCoreService.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\security\controller\AuthController.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\security\controller\SecurityController.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\security\dto\response\CredencialWebResponse.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\security\dto\response\UsuarioCoreResponse.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\security\enums\EstadoCredencialWebEnum.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\security\enums\EstadoUsuarioCoreEnum.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\security\enums\RolUsuarioCoreEnum.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\security\mapper\CredencialWebMapper.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\security\mapper\SeguridadMapper.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\security\mapper\UsuarioCoreMapper.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\security\model\CredencialWeb.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\security\model\UsuarioCore.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\security\repository\CredencialWebRepository.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\security\repository\UsuarioCoreRepository.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\security\service\AuthService.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\security\service\CredencialWebService.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\security\service\UsuarioCoreService.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\shared\enums\CanalOrigenEnum.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\shared\enums\EstadoCatalogoEnum.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\shared\exception\AccountNotActiveException.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\shared\exception\BusinessException.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\shared\exception\DuplicateResourceException.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\shared\exception\GlobalExceptionHandler.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\shared\exception\IdempotencyException.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\shared\exception\InsufficientFundsException.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\shared\exception\ResourceNotFoundException.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\shared\exception\ValidationException.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\shared\response\ApiResponse.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\transactions\controller\TransaccionController.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\transactions\dto\request\TransferenciaRequest.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\transactions\dto\response\MovimientoCuentaResponse.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\transactions\dto\response\TransferenciaResponse.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\transactions\enums\EstadoTransaccionEnum.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\transactions\enums\TipoMovimientoEnum.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\transactions\mapper\TransaccionMapper.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\transactions\model\SubtipoTransaccion.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\transactions\model\TransaccionCuenta.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\transactions\model\TransaccionInstitucional.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\transactions\repository\SubtipoTransaccionRepository.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\transactions\repository\TransaccionCuentaRepository.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\transactions\repository\TransaccionInstitucionalRepository.java
-C:\Users\Usuario\Documents\banquito-core-backend\banquito-core-backend\src\main\java\com\banquito\core\transactions\service\MotorTransaccionalService.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\accounts\controller\CuentaController.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\accounts\dto\request\BloquearCuentaRequest.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\accounts\dto\request\CambiarEstadoCuentaRequest.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\accounts\dto\request\CrearCuentaRequest.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\accounts\dto\response\CuentaResponse.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\accounts\dto\response\SaldoCuentaResponse.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\accounts\enums\EstadoBloqueoCuentaEnum.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\accounts\enums\EstadoCuentaEnum.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\accounts\enums\TipoBaseCuentaEnum.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\accounts\mapper\CuentaMapper.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\accounts\model\BloqueoCuenta.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\accounts\model\Cuenta.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\accounts\model\HistorialEstadoCuenta.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\accounts\model\SubtipoCuenta.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\accounts\repository\BloqueoCuentaRepository.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\accounts\repository\CuentaRepository.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\accounts\repository\HistorialEstadoCuentaRepository.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\accounts\repository\SubtipoCuentaRepository.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\accounts\service\CuentaService.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\audit\controller\AuditoriaController.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\audit\dto\response\AuditoriaEventoResponse.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\audit\enums\ResultadoAuditoriaEnum.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\audit\mapper\AuditoriaMapper.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\audit\model\AuditoriaEvento.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\audit\repository\AuditoriaEventoRepository.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\audit\service\AuditoriaService.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\branches\controller\SucursalController.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\branches\dto\request\SucursalRequest.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\branches\dto\response\SucursalResponse.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\branches\enums\EstadoSucursalEnum.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\branches\mapper\SucursalMapper.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\branches\model\Sucursal.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\branches\repository\SucursalRepository.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\branches\service\SucursalService.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\CoreApplication.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\customers\controller\ClienteController.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\customers\dto\request\ClienteRequest.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\customers\dto\response\ClienteResponse.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\customers\enums\EstadoClienteEnum.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\customers\enums\TipoClienteEnum.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\customers\enums\TipoIdentificacionEnum.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\customers\mapper\ClienteMapper.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\customers\model\Cliente.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\customers\model\SubtipoCliente.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\customers\repository\ClienteRepository.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\customers\repository\SubtipoClienteRepository.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\customers\service\ClienteService.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\institutional\controller\CuentaInstitucionalController.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\institutional\dto\response\CuentaInstitucionalResponse.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\institutional\enums\EstadoCuentaInstitucionalEnum.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\institutional\enums\TipoCuentaInstitucionalEnum.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\institutional\mapper\CuentaInstitucionalMapper.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\institutional\model\CuentaInstitucional.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\institutional\repository\CuentaInstitucionalRepository.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\institutional\service\CuentaInstitucionalService.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\integration\switchapi\controller\IntegracionSwitchController.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\integration\switchapi\dto\request\LiquidacionServicioSwitchRequest.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\integration\switchapi\dto\response\LiquidacionServicioSwitchResponse.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\integration\switchapi\dto\response\ValidarEmpresaSwitchResponse.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\integration\switchapi\service\IntegracionSwitchService.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\parameters\controller\FeriadoController.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\parameters\controller\ParametroCoreController.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\parameters\dto\response\FeriadoResponse.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\parameters\dto\response\ParametroCoreResponse.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\parameters\enums\TipoDatoParametroEnum.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\parameters\mapper\ParametroMapper.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\parameters\model\Feriado.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\parameters\model\ParametroCore.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\parameters\repository\FeriadoRepository.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\parameters\repository\ParametroCoreRepository.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\parameters\service\FeriadoService.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\parameters\service\ParametroCoreService.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\security\controller\AuthController.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\security\controller\SecurityController.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\security\dto\response\CredencialWebResponse.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\security\dto\response\UsuarioCoreResponse.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\security\enums\EstadoCredencialWebEnum.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\security\enums\EstadoUsuarioCoreEnum.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\security\enums\RolUsuarioCoreEnum.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\security\mapper\CredencialWebMapper.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\security\mapper\SeguridadMapper.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\security\mapper\UsuarioCoreMapper.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\security\model\CredencialWeb.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\security\model\UsuarioCore.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\security\repository\CredencialWebRepository.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\security\repository\UsuarioCoreRepository.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\security\service\AuthService.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\security\service\CredencialWebService.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\security\service\UsuarioCoreService.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\shared\enums\CanalOrigenEnum.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\shared\enums\EstadoCatalogoEnum.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\shared\exception\AccountNotActiveException.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\shared\exception\BusinessException.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\shared\exception\DuplicateResourceException.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\shared\exception\GlobalExceptionHandler.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\shared\exception\IdempotencyException.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\shared\exception\InsufficientFundsException.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\shared\exception\NotFoundException.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\shared\exception\ResourceNotFoundException.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\shared\exception\ValidationException.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\shared\response\ApiResponse.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\shared\response\ErrorResponse.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\transactions\controller\TransaccionController.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\transactions\dto\request\TransferenciaRequest.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\transactions\dto\response\MovimientoCuentaResponse.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\transactions\dto\response\TransferenciaResponse.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\transactions\enums\EstadoTransaccionEnum.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\transactions\enums\TipoMovimientoEnum.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\transactions\mapper\TransaccionMapper.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\transactions\model\SubtipoTransaccion.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\transactions\model\TransaccionCuenta.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\transactions\model\TransaccionInstitucional.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\transactions\repository\SubtipoTransaccionRepository.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\transactions\repository\TransaccionCuentaRepository.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\transactions\repository\TransaccionInstitucionalRepository.java
+C:\Arquitectura 2026\CORE_BACK_BANQUITO_GRUPO2\src\main\java\com\banquito\core\transactions\service\MotorTransaccionalService.java

@@ -18,7 +18,10 @@ import com.banquito.core.branches.repository.SucursalRepository;
 import com.banquito.core.customers.repository.ClienteRepository;
 import com.banquito.core.security.repository.UsuarioCoreRepository;
 import com.banquito.core.shared.exception.ResourceNotFoundException;
-import lombok.RequiredArgsConstructor;
+import com.banquito.core.shared.exception.ValidationException;import lombok.RequiredArgsConstructor;
+import com.banquito.core.audit.enums.ResultadoAuditoriaEnum;
+import com.banquito.core.audit.service.AuditoriaService;
+import com.banquito.core.shared.enums.CanalOrigenEnum;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,10 +38,17 @@ public class CuentaService {
     private final BloqueoCuentaRepository bloqueoRepository;
     private final HistorialEstadoCuentaRepository historialRepository;
     private final UsuarioCoreRepository usuarioCoreRepository;
+    private final AuditoriaService auditoriaService;
 
     public List<CuentaResponse> listar() { return cuentaRepository.findAll().stream().map(CuentaMapper::toResponse).toList(); }
     public Cuenta obtenerEntidad(Integer id) { return cuentaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cuenta no encontrada: " + id)); }
-    public Cuenta obtenerPorNumero(String numeroCuenta) { return cuentaRepository.findByNumeroCuenta(numeroCuenta).orElseThrow(() -> new ResourceNotFoundException("Cuenta no encontrada: " + numeroCuenta)); }
+    public Cuenta obtenerPorNumero(String numeroCuenta) { 
+        return cuentaRepository.findByNumeroCuenta(numeroCuenta)
+                .orElseThrow(() -> new ResourceNotFoundException("Cuenta no encontrada: " + numeroCuenta)); 
+    }
+    public CuentaResponse obtenerResponsePorNumero(String numeroCuenta) {
+        return CuentaMapper.toResponse(obtenerPorNumero(numeroCuenta));
+    }
     public CuentaResponse obtener(Integer id) { return CuentaMapper.toResponse(obtenerEntidad(id)); }
     public SaldoCuentaResponse saldo(String numeroCuenta) { return CuentaMapper.toSaldoResponse(obtenerPorNumero(numeroCuenta)); }
 
@@ -57,7 +67,19 @@ public class CuentaService {
         c.setSaldoDisponible(BigDecimal.ZERO);
         c.setPermiteSobregiro(Boolean.TRUE.equals(request.permiteSobregiro()));
         c.setEsFavoritaPagos(Boolean.TRUE.equals(request.esFavoritaPagos()));
-        return CuentaMapper.toResponse(cuentaRepository.save(c));
+        Cuenta cuentaGuardada = cuentaRepository.save(c);
+
+        auditoriaService.registrarEvento(
+                "ACCOUNTS",
+                "CREAR_CUENTA",
+                "CUENTA",
+                cuentaGuardada.getId().toString(),
+                ResultadoAuditoriaEnum.EXITOSO,
+                CanalOrigenEnum.WEB,
+                "{\"numeroCuenta\":\"" + cuentaGuardada.getNumeroCuenta() + "\"}"
+        );
+
+        return CuentaMapper.toResponse(cuentaGuardada);
     }
 
     @Transactional
@@ -73,7 +95,20 @@ public class CuentaService {
         historial.setMotivoCambio(request.motivoCambio());
         historial.setUsuarioCore(usuario);
         historialRepository.save(historial);
-        return CuentaMapper.toResponse(cuentaRepository.save(cuenta));
+
+        Cuenta cuentaGuardada = cuentaRepository.save(cuenta);
+
+        auditoriaService.registrarEvento(
+                "ACCOUNTS",
+                "CAMBIAR_ESTADO_CUENTA",
+                "CUENTA",
+                cuentaGuardada.getId().toString(),
+                ResultadoAuditoriaEnum.EXITOSO,
+                CanalOrigenEnum.WEB,
+                "{\"estadoAnterior\":\"" + anterior + "\",\"estadoNuevo\":\"" + request.nuevoEstado() + "\"}"
+        );
+
+        return CuentaMapper.toResponse(cuentaGuardada);
     }
 
     @Transactional
@@ -91,5 +126,41 @@ public class CuentaService {
         bloqueoRepository.save(bloqueo);
         cuenta.setSaldoDisponible(cuenta.getSaldoDisponible().subtract(request.montoBloqueado()));
         cuentaRepository.save(cuenta);
+        auditoriaService.registrarEvento(
+            "ACCOUNTS",
+            "BLOQUEAR_CUENTA",
+            "CUENTA",
+            cuenta.getId().toString(),
+            ResultadoAuditoriaEnum.EXITOSO,
+            CanalOrigenEnum.WEB,
+            "{\"montoBloqueado\":" + request.montoBloqueado() + "}"
+    );
+    }
+
+    @Transactional
+    public void liberarBloqueo(Integer idBloqueo) {
+        BloqueoCuenta bloqueo = bloqueoRepository.findById(idBloqueo)
+                .orElseThrow(() -> new ResourceNotFoundException("Bloqueo no encontrado: " + idBloqueo));
+
+        if (bloqueo.getEstado() != EstadoBloqueoCuentaEnum.ACTIVO) {
+            throw new ValidationException("El bloqueo ya fue liberado o no está activo");
+        }
+
+        Cuenta cuenta = bloqueo.getCuenta();
+
+        bloqueo.setEstado(EstadoBloqueoCuentaEnum.LIBERADO);
+        cuenta.setSaldoDisponible(cuenta.getSaldoDisponible().add(bloqueo.getMontoBloqueado()));
+
+        bloqueoRepository.save(bloqueo);
+        cuentaRepository.save(cuenta);
+        auditoriaService.registrarEvento(
+            "ACCOUNTS",
+            "LIBERAR_BLOQUEO_CUENTA",
+            "BLOQUEO_CUENTA",
+            idBloqueo.toString(),
+            ResultadoAuditoriaEnum.EXITOSO,
+            CanalOrigenEnum.WEB,
+            "{\"cuentaId\":\"" + cuenta.getId() + "\",\"montoLiberado\":" + bloqueo.getMontoBloqueado() + "}"
+        );
     }
 }

@@ -3,10 +3,13 @@ package com.banquito.core.accounts.controller;
 import com.banquito.core.accounts.dto.request.BloquearCuentaRequest;
 import com.banquito.core.accounts.dto.request.CambiarEstadoCuentaRequest;
 import com.banquito.core.accounts.dto.request.CrearCuentaRequest;
+import com.banquito.core.accounts.dto.response.CuentaResponse;
 import com.banquito.core.accounts.service.CuentaService;
 import com.banquito.core.shared.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,4 +23,13 @@ public class CuentaController {
     @PostMapping public ApiResponse<?> crear(@Valid @RequestBody CrearCuentaRequest request) { return ApiResponse.ok("Cuenta creada", service.crear(request)); }
     @PatchMapping("/{id}/estado") public ApiResponse<?> cambiarEstado(@PathVariable Integer id, @Valid @RequestBody CambiarEstadoCuentaRequest request) { return ApiResponse.ok("Estado actualizado", service.cambiarEstado(id, request)); }
     @PostMapping("/{id}/bloqueos") public ApiResponse<?> bloquear(@PathVariable Integer id, @Valid @RequestBody BloquearCuentaRequest request) { service.bloquear(id, request); return ApiResponse.ok("Bloqueo registrado", null); }
+    @GetMapping("/numero/{numeroCuenta}")
+    public ApiResponse<?> obtenerPorNumero(@PathVariable String numeroCuenta) {
+        return ApiResponse.ok("Cuenta obtenida", service.obtenerResponsePorNumero(numeroCuenta));
+    }
+    @PatchMapping("/bloqueos/{id}/liberar")
+    public ApiResponse<?> liberarBloqueo(@PathVariable Integer id) {
+        service.liberarBloqueo(id);
+        return ApiResponse.ok("Bloqueo liberado correctamente", null);
+    }
 }
