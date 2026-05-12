@@ -1,4 +1,4 @@
-package com.banquito.core.security.dto.response;
+package com.banquito.core.security.dto;
 
 import com.banquito.core.security.enums.EstadoCredencialWebEnum;
 

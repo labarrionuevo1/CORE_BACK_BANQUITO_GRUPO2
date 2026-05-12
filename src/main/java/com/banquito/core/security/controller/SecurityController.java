@@ -1,7 +1,5 @@
 package com.banquito.core.security.controller;
 
-import com.banquito.core.security.dto.response.CredencialWebResponse;
-import com.banquito.core.security.dto.response.UsuarioCoreResponse;
 import com.banquito.core.security.enums.EstadoCredencialWebEnum;
 import com.banquito.core.security.enums.EstadoUsuarioCoreEnum;
 import com.banquito.core.security.enums.RolUsuarioCoreEnum;

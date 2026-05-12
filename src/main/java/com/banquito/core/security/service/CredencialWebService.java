@@ -1,6 +1,6 @@
 package com.banquito.core.security.service;
 
-import com.banquito.core.security.dto.response.CredencialWebResponse;
+import com.banquito.core.security.dto.CredencialWebResponse;
 import com.banquito.core.security.enums.EstadoCredencialWebEnum;
 import com.banquito.core.security.mapper.CredencialWebMapper;
 import com.banquito.core.security.model.CredencialWeb;

@@ -1,7 +1,7 @@
 package com.banquito.core.parameters.mapper;
 
-import com.banquito.core.parameters.dto.response.FeriadoResponse;
-import com.banquito.core.parameters.dto.response.ParametroCoreResponse;
+import com.banquito.core.parameters.dto.FeriadoResponse;
+import com.banquito.core.parameters.dto.ParametroCoreResponse;
 import com.banquito.core.parameters.model.Feriado;
 import com.banquito.core.parameters.model.ParametroCore;
 

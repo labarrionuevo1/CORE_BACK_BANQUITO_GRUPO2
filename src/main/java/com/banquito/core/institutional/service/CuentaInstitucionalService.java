@@ -1,12 +1,11 @@
 package com.banquito.core.institutional.service;
 
-import com.banquito.core.institutional.dto.response.CuentaInstitucionalResponse;
+import com.banquito.core.institutional.dto.CuentaInstitucionalResponse;
 import com.banquito.core.institutional.mapper.CuentaInstitucionalMapper;
 import com.banquito.core.institutional.model.CuentaInstitucional;
 import com.banquito.core.institutional.repository.CuentaInstitucionalRepository;
 import com.banquito.core.shared.exception.ResourceNotFoundException;
 import com.banquito.core.institutional.enums.EstadoCuentaInstitucionalEnum;
-import com.banquito.core.shared.exception.ValidationException;
 import com.banquito.core.shared.exception.ValidationException;
 
 import lombok.RequiredArgsConstructor;

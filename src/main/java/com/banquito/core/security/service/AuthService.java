@@ -1,7 +1,7 @@
 package com.banquito.core.security.service;
 
-import com.banquito.core.security.dto.response.CredencialWebResponse;
-import com.banquito.core.security.dto.response.UsuarioCoreResponse;
+import com.banquito.core.security.dto.CredencialWebResponse;
+import com.banquito.core.security.dto.UsuarioCoreResponse;
 import com.banquito.core.security.mapper.SeguridadMapper;
 import com.banquito.core.security.repository.CredencialWebRepository;
 import com.banquito.core.security.repository.UsuarioCoreRepository;

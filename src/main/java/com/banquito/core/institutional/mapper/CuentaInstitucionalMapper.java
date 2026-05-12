@@ -1,6 +1,6 @@
 package com.banquito.core.institutional.mapper;
 
-import com.banquito.core.institutional.dto.response.CuentaInstitucionalResponse;
+import com.banquito.core.institutional.dto.CuentaInstitucionalResponse;
 import com.banquito.core.institutional.model.CuentaInstitucional;
 
 public final class CuentaInstitucionalMapper {

@@ -1,4 +1,4 @@
-package com.banquito.core.audit.dto.response;
+package com.banquito.core.audit.dto;
 
 import com.banquito.core.audit.enums.ResultadoAuditoriaEnum;
 import com.banquito.core.shared.enums.CanalOrigenEnum;

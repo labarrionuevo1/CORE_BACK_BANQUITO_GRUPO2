@@ -1,6 +1,6 @@
 package com.banquito.core.parameters.service;
 
-import com.banquito.core.parameters.dto.response.FeriadoResponse;
+import com.banquito.core.parameters.dto.FeriadoResponse;
 import com.banquito.core.parameters.mapper.ParametroMapper;
 import com.banquito.core.parameters.repository.FeriadoRepository;
 import com.banquito.core.shared.exception.ResourceNotFoundException;

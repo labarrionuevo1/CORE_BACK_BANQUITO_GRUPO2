@@ -1,4 +1,4 @@
-package com.banquito.core.institutional.dto.response;
+package com.banquito.core.institutional.dto;
 
 import com.banquito.core.institutional.enums.EstadoCuentaInstitucionalEnum;
 import com.banquito.core.institutional.enums.TipoCuentaInstitucionalEnum;

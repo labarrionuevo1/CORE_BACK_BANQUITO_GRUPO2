@@ -1,6 +1,6 @@
 package com.banquito.core.audit.mapper;
 
-import com.banquito.core.audit.dto.response.AuditoriaEventoResponse;
+import com.banquito.core.audit.dto.AuditoriaEventoResponse;
 import com.banquito.core.audit.model.AuditoriaEvento;
 
 public final class AuditoriaMapper {

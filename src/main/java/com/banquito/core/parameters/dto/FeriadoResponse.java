@@ -1,4 +1,4 @@
-package com.banquito.core.parameters.dto.response;
+package com.banquito.core.parameters.dto;
 
 import com.banquito.core.shared.enums.EstadoCatalogoEnum;
 import java.time.LocalDate;
