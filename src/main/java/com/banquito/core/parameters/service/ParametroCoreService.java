@@ -1,6 +1,6 @@
 package com.banquito.core.parameters.service;
 
-import com.banquito.core.parameters.dto.ParametroCoreResponse;
+import com.banquito.core.parameters.dto.api.ParametroCoreResponse;
 
 import java.util.List;
 

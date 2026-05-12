@@ -1,6 +1,6 @@
 package com.banquito.core.parameters.service.impl;
 
-import com.banquito.core.parameters.dto.ParametroCoreResponse;
+import com.banquito.core.parameters.dto.api.ParametroCoreResponse;
 import com.banquito.core.parameters.mapper.ParametroMapper;
 import com.banquito.core.parameters.repository.ParametroCoreRepository;
 import com.banquito.core.parameters.service.ParametroCoreService;

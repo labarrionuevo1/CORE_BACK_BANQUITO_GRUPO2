@@ -1,7 +1,7 @@
 package com.banquito.core.branches.service;
 
-import com.banquito.core.branches.dto.request.SucursalRequest;
-import com.banquito.core.branches.dto.response.SucursalResponse;
+import com.banquito.core.branches.dto.api.SucursalRequest;
+import com.banquito.core.branches.dto.api.SucursalResponse;
 import com.banquito.core.branches.model.Sucursal;
 
 import java.util.List;

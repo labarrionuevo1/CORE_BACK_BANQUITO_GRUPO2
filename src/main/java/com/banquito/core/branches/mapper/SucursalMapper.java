@@ -1,6 +1,6 @@
 package com.banquito.core.branches.mapper;
 
-import com.banquito.core.branches.dto.response.SucursalResponse;
+import com.banquito.core.branches.dto.api.SucursalResponse;
 import com.banquito.core.branches.model.Sucursal;
 
 public final class SucursalMapper {

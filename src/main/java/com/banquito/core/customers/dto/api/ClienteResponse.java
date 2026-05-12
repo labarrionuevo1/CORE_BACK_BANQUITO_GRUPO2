@@ -1,4 +1,4 @@
-package com.banquito.core.customers.dto.response;
+package com.banquito.core.customers.dto.api;
 
 import com.banquito.core.customers.enums.EstadoClienteEnum;
 import com.banquito.core.customers.enums.TipoClienteEnum;

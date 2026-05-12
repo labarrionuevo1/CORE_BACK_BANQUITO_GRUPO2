@@ -1,7 +1,7 @@
 package com.banquito.core.customers.service.impl;
 
-import com.banquito.core.customers.dto.request.ClienteRequest;
-import com.banquito.core.customers.dto.response.ClienteResponse;
+import com.banquito.core.customers.dto.api.ClienteRequest;
+import com.banquito.core.customers.dto.api.ClienteResponse;
 import com.banquito.core.customers.enums.EstadoClienteEnum;
 import com.banquito.core.customers.enums.TipoClienteEnum;
 import com.banquito.core.customers.enums.TipoIdentificacionEnum;

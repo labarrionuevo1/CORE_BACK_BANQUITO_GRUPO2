@@ -1,6 +1,6 @@
 package com.banquito.core.customers.mapper;
 
-import com.banquito.core.customers.dto.response.ClienteResponse;
+import com.banquito.core.customers.dto.api.ClienteResponse;
 import com.banquito.core.customers.model.Cliente;
 
 public final class ClienteMapper {

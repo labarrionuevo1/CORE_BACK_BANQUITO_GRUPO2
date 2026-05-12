@@ -1,6 +1,7 @@
 package com.banquito.core.branches.controller;
 
-import com.banquito.core.branches.dto.request.SucursalRequest;
+import com.banquito.core.branches.dto.api.SucursalRequest;
+import com.banquito.core.branches.dto.api.SucursalResponse;
 import com.banquito.core.branches.service.SucursalService;
 import com.banquito.core.shared.response.ApiResponse;
 import jakarta.validation.Valid;

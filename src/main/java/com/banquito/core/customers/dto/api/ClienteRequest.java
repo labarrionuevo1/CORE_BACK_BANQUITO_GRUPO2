@@ -1,4 +1,4 @@
-package com.banquito.core.customers.dto.request;
+package com.banquito.core.customers.dto.api;
 
 import com.banquito.core.customers.enums.TipoClienteEnum;
 import com.banquito.core.customers.enums.TipoIdentificacionEnum;

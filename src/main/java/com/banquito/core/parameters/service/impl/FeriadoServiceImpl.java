@@ -1,6 +1,6 @@
 package com.banquito.core.parameters.service.impl;
 
-import com.banquito.core.parameters.dto.FeriadoResponse;
+import com.banquito.core.parameters.dto.api.FeriadoResponse;
 import com.banquito.core.parameters.mapper.ParametroMapper;
 import com.banquito.core.parameters.repository.FeriadoRepository;
 import com.banquito.core.parameters.service.FeriadoService;

@@ -1,6 +1,6 @@
 package com.banquito.core.parameters.service;
 
-import com.banquito.core.parameters.dto.FeriadoResponse;
+import com.banquito.core.parameters.dto.api.FeriadoResponse;
 
 import java.time.LocalDate;
 import java.util.List;

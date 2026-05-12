@@ -1,7 +1,8 @@
 package com.banquito.core.customers.controller;
 
-import com.banquito.core.customers.dto.request.ClienteRequest;
-import com.banquito.core.customers.enums.EstadoClienteEnum;
+import com.banquito.core.customers.dto.api.ClienteRequest;
+import com.banquito.core.customers.dto.api.ClienteEstadoRequest;
+import com.banquito.core.customers.dto.api.ClienteValidacionResponse;
 import com.banquito.core.customers.service.ClienteService;
 import com.banquito.core.shared.response.ApiResponse;
 import jakarta.validation.Valid;
@@ -35,15 +36,17 @@ public class ClienteController {
     }
     
     @PatchMapping("/{id}/estado")
-    public ApiResponse<?> cambiarEstado(@PathVariable Integer id, @RequestBody EstadoRequest request) {
-        return ApiResponse.ok("Estado actualizado", service.cambiarEstado(id, request.estado));
+    public ApiResponse<?> cambiarEstado(@PathVariable Integer id, @RequestBody ClienteEstadoRequest request) {
+        return ApiResponse.ok("Estado actualizado", service.cambiarEstado(id, request.estado()));
     }
     
     @GetMapping("/ruc/{ruc}/validacion-pagos-masivos")
     public ApiResponse<?> validarEmpresaParaPagosMasivos(@PathVariable String ruc) {
         boolean esValida = service.validarEmpresaParaPagosMasivos(ruc);
-        return ApiResponse.ok("Validación completada", esValida);
+        String mensaje = esValida ? "Empresa válida para pagos masivos" : "Empresa no válida para pagos masivos";
+        String motivo = esValida ? null : "La empresa no está activa o no tiene habilitados pagos masivos";
+        
+        ClienteValidacionResponse response = new ClienteValidacionResponse(ruc, esValida, mensaje, motivo);
+        return ApiResponse.ok("Validación completada", response);
     }
-    
-    public record EstadoRequest(EstadoClienteEnum estado) {}
 }
