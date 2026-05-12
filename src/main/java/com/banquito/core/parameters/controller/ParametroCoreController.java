@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/core/parametros")
+@RequestMapping("/api/v1/core/parametros")
 @RequiredArgsConstructor
 @Slf4j
 public class ParametroCoreController {

@@ -45,11 +45,11 @@ public class SucursalService {
     }
     
     public SucursalResponse crear(SucursalRequest request) {
-        Sucursal s = new Sucursal();
-        s.setCodigoSucursal(request.codigoSucursal());
-        s.setNombre(request.nombre());
-        s.setCiudad(request.ciudad());
-        s.setDireccion(request.direccion());
-        return SucursalMapper.toResponse(repository.save(s));
+        Sucursal sucursal = new Sucursal();
+        sucursal.setCodigoSucursal(request.codigoSucursal());
+        sucursal.setNombre(request.nombre());
+        sucursal.setCiudad(request.ciudad());
+        sucursal.setDireccion(request.direccion());
+        return SucursalMapper.toResponse(repository.save(sucursal));
     }
 }

@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/core/sucursales")
+@RequestMapping("/api/v1/core/sucursales")
 @RequiredArgsConstructor
 @Slf4j
 public class SucursalController {

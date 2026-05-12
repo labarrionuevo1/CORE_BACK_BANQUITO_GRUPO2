@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 
 @RestController
-@RequestMapping("/api/core/feriados")
+@RequestMapping("/api/v1/core/feriados")
 @RequiredArgsConstructor
 @Slf4j
 public class FeriadoController {

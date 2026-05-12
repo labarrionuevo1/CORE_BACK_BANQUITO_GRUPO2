@@ -50,26 +50,26 @@ public class ClienteService {
         validarDatosPorTipo(request);
         
         Cliente representante = request.representanteLegalId() != null ? obtenerEntidad(request.representanteLegalId()) : null;
-        Cliente c = new Cliente();
-        c.setSubtipoClienteId(request.subtipoClienteId());
-        c.setTipoCliente(request.tipoCliente());
-        c.setTipoIdentificacion(request.tipoIdentificacion());
-        c.setIdentificacion(request.identificacion());
-        c.setNombres(request.nombres());
-        c.setApellidos(request.apellidos());
-        c.setRazonSocial(request.razonSocial());
-        c.setFechaNacimiento(request.fechaNacimiento());
-        c.setFechaConstitucion(request.fechaConstitucion());
-        c.setRepresentanteLegal(representante);
-        c.setEmail(request.email());
-        c.setTelefonoMovil(request.telefonoMovil());
-        c.setDireccion(request.direccion());
-        c.setLatitud(request.latitud());
-        c.setLongitud(request.longitud());
-        c.setActivoPagosMasivos(Boolean.TRUE.equals(request.activoPagosMasivos()));
-        c.setEstado(EstadoClienteEnum.ACTIVO);
+        Cliente cliente = new Cliente();
+        cliente.setSubtipoClienteId(request.subtipoClienteId());
+        cliente.setTipoCliente(request.tipoCliente());
+        cliente.setTipoIdentificacion(request.tipoIdentificacion());
+        cliente.setIdentificacion(request.identificacion());
+        cliente.setNombres(request.nombres());
+        cliente.setApellidos(request.apellidos());
+        cliente.setRazonSocial(request.razonSocial());
+        cliente.setFechaNacimiento(request.fechaNacimiento());
+        cliente.setFechaConstitucion(request.fechaConstitucion());
+        cliente.setRepresentanteLegal(representante);
+        cliente.setEmail(request.email());
+        cliente.setTelefonoMovil(request.telefonoMovil());
+        cliente.setDireccion(request.direccion());
+        cliente.setLatitud(request.latitud());
+        cliente.setLongitud(request.longitud());
+        cliente.setActivoPagosMasivos(Boolean.TRUE.equals(request.activoPagosMasivos()));
+        cliente.setEstado(EstadoClienteEnum.ACTIVO);
         
-        ClienteResponse response = ClienteMapper.toResponse(repository.save(c));
+        ClienteResponse response = ClienteMapper.toResponse(repository.save(cliente));
         log.info("Cliente creado exitosamente: {}", response.id());
         return response;
     }
