@@ -1,12 +1,17 @@
 package com.banquito.core.audit.controller;
 
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.banquito.core.audit.service.AuditoriaService;
 import com.banquito.core.shared.response.ApiResponse;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/core/auditoria")
+@RequestMapping("/api/v1/core/auditoria")
 @RequiredArgsConstructor
 public class AuditoriaController {
 

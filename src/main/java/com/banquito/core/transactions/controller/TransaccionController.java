@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/core/transacciones")
+@RequestMapping("/api/v1/core/transacciones")
 @RequiredArgsConstructor
 public class TransaccionController {
 

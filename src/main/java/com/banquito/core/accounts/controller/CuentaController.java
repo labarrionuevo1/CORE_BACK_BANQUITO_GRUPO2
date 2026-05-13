@@ -1,19 +1,24 @@
 package com.banquito.core.accounts.controller;
 
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.banquito.core.accounts.dto.request.BloquearCuentaRequest;
 import com.banquito.core.accounts.dto.request.CambiarEstadoCuentaRequest;
 import com.banquito.core.accounts.dto.request.CrearCuentaRequest;
-import com.banquito.core.accounts.dto.response.CuentaResponse;
 import com.banquito.core.accounts.service.CuentaService;
 import com.banquito.core.shared.response.ApiResponse;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 @RestController
-@RequestMapping("/api/core/cuentas")
+@RequestMapping("/api/v1/core/cuentas")
 @RequiredArgsConstructor
 public class CuentaController {
     private final CuentaService service;

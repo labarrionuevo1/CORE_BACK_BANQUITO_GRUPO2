@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 
 @RestController
-@RequestMapping("/api/core/integracion-switch")
+@RequestMapping("/api/v1/core/integracion-switch")
 @RequiredArgsConstructor
 public class IntegracionSwitchController {
 
