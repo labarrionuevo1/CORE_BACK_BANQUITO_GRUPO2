@@ -21,7 +21,7 @@ import com.banquito.core.shared.exception.ValidationException;
 import com.banquito.core.transactions.dto.api.TransferenciaRequest;
 import com.banquito.core.transactions.dto.api.TransferenciaResponse;
 import com.banquito.core.transactions.enums.TipoMovimientoEnum;
-import com.banquito.core.transactions.service.MotorTransaccionalService;
+import com.banquito.core.transactions.service.TransaccionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +36,7 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
 
     private final ClienteRepository clienteRepository;
     private final CuentaService cuentaService;
-    private final MotorTransaccionalService motorTransaccionalService;
+    private final TransaccionService transaccionService;
     private final FeriadoService feriadoService;
     private final AuditoriaService auditoriaService;
 
@@ -102,7 +102,7 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
     @Override
     @Transactional
     public TransferenciaResponse ejecutarTransferencia(TransferenciaRequest request) {
-        return motorTransaccionalService.ejecutarTransferencia(request);
+        return transaccionService.ejecutarTransferencia(request);
     }
 
     @Override
@@ -110,14 +110,14 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
     public LiquidacionServicioSwitchResponse liquidarServicio(LiquidacionServicioSwitchRequest request) {
         validarTotalLiquidacion(request);
 
-        UUID uuidDebitoMatriz = motorTransaccionalService.debitarCuentaMatrizLiquidacion(
+        UUID uuidDebitoMatriz = transaccionService.debitarCuentaMatrizLiquidacion(
                 request.cuentaMatriz(),
                 request.totalDebitado(),
                 request.uuidGrupoOperacion(),
                 request.referenciaExterna()
         );
 
-        UUID uuidCreditoIngresos = motorTransaccionalService.registrarMovimientoInstitucional(
+        UUID uuidCreditoIngresos = transaccionService.registrarMovimientoInstitucional(
                 request.codigoCuentaIngresos(),
                 "INGRESO_SERVICIO_MASIVO",
                 TipoMovimientoEnum.CREDITO,
@@ -126,7 +126,7 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
                 request.referenciaExterna()
         );
 
-        UUID uuidCreditoIva = motorTransaccionalService.registrarMovimientoInstitucional(
+        UUID uuidCreditoIva = transaccionService.registrarMovimientoInstitucional(
                 request.codigoCuentaIva(),
                 "IVA_SERVICIO_MASIVO",
                 TipoMovimientoEnum.CREDITO,
