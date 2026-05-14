@@ -13,6 +13,8 @@ public interface CuentaService {
 
     List<CuentaResponse> listar();
 
+    List<CuentaResponse> listarPorCliente(Integer clienteId);
+
     Cuenta obtenerEntidad(Integer id);
 
     Cuenta obtenerPorNumero(String numeroCuenta);

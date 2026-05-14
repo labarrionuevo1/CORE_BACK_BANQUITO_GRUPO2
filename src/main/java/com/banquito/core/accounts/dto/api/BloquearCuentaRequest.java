@@ -7,9 +7,19 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 public record BloquearCuentaRequest(
-        @NotNull @DecimalMin("0.01") BigDecimal montoBloqueado,
-        @NotBlank String motivo,
+
+        @NotNull(message = "El monto bloqueado es obligatorio")
+        @DecimalMin(value = "0.01", message = "El monto bloqueado debe ser mayor a cero")
+        BigDecimal montoBloqueado,
+
+        @NotBlank(message = "El motivo del bloqueo es obligatorio")
+        String motivo,
+
         String autoridadOrdenante,
-        Integer usuarioCoreId,
-        String observaciones
-) {}
+
+        String observaciones,
+
+        @NotNull(message = "El usuario core es obligatorio")
+        Integer usuarioCoreId
+) {
+}

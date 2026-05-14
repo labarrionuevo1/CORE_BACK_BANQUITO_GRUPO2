@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.stream.Collectors;
 
@@ -125,6 +126,18 @@ public class GlobalExceptionHandler {
                 "Error interno del servidor",
                 request
         );
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleTypeMismatch(
+            MethodArgumentTypeMismatchException ex,
+            HttpServletRequest request
+    ) {
+        String parametro = ex.getName();
+        String valor = ex.getValue() != null ? ex.getValue().toString() : "null";
+        String message = "Valor invalido para el parametro '" + parametro + "': " + valor;
+
+        return build(HttpStatus.BAD_REQUEST, "INVALID_REQUEST_PARAMETER", message, request);
     }
 
     private ResponseEntity<ErrorResponse> build(

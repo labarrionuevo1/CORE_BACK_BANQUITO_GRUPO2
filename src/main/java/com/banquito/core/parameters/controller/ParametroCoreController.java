@@ -1,6 +1,5 @@
 package com.banquito.core.parameters.controller;
 
-import com.banquito.core.parameters.dto.api.ParametroCoreResponse;
 import com.banquito.core.parameters.service.ParametroCoreService;
 import com.banquito.core.shared.response.ApiResponse;
 import lombok.RequiredArgsConstructor;

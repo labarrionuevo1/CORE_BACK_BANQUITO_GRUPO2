@@ -6,33 +6,49 @@ import com.banquito.core.security.model.CredencialWeb;
 import com.banquito.core.security.model.UsuarioCore;
 
 public final class SeguridadMapper {
-    private SeguridadMapper() {}
-    
-    public static CredencialWebResponse toResponse(CredencialWeb c) {
-        Integer clienteId = c.getCliente() != null ? c.getCliente().getId() : null;
+
+    private SeguridadMapper() {
+    }
+
+    public static CredencialWebResponse toResponse(CredencialWeb credencial) {
+        if (credencial == null) {
+            return null;
+        }
+
+        Integer clienteId = credencial.getCliente() != null
+                ? credencial.getCliente().getId()
+                : null;
+
         return new CredencialWebResponse(
-                c.getId(), 
-                clienteId, 
-                c.getUsuario(), 
-                c.getEstado(),
-                c.getUltimoLogin(),
-                c.getFechaCreacion(),
-                c.getFechaActualizacion()
+                credencial.getId(),
+                clienteId,
+                credencial.getUsuario(),
+                credencial.getEstado(),
+                credencial.getUltimoLogin(),
+                credencial.getFechaCreacion(),
+                credencial.getFechaActualizacion()
         );
     }
-    
-    public static UsuarioCoreResponse toResponse(UsuarioCore u) {
-        Integer sucursalId = u.getSucursal() != null ? u.getSucursal().getId() : null;
+
+    public static UsuarioCoreResponse toResponse(UsuarioCore usuario) {
+        if (usuario == null) {
+            return null;
+        }
+
+        Integer sucursalId = usuario.getSucursal() != null
+                ? usuario.getSucursal().getId()
+                : null;
+
         return new UsuarioCoreResponse(
-                u.getId(), 
-                sucursalId, 
-                u.getUsuario(), 
-                u.getNombreCompleto(), 
-                u.getRol(), 
-                u.getEstado(),
-                u.getUltimoLogin(),
-                u.getFechaCreacion(),
-                u.getFechaActualizacion()
+                usuario.getId(),
+                sucursalId,
+                usuario.getUsuario(),
+                usuario.getNombreCompleto(),
+                usuario.getRol(),
+                usuario.getEstado(),
+                usuario.getUltimoLogin(),
+                usuario.getFechaCreacion(),
+                usuario.getFechaActualizacion()
         );
     }
 }
