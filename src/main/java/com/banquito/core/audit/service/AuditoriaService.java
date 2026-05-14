@@ -1,6 +1,6 @@
 package com.banquito.core.audit.service;
 
-import com.banquito.core.audit.dto.AuditoriaEventoResponse;
+import com.banquito.core.audit.dto.api.AuditoriaEventoResponse;
 import com.banquito.core.audit.enums.ResultadoAuditoriaEnum;
 import com.banquito.core.shared.enums.CanalOrigenEnum;
 

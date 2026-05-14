@@ -1,11 +1,11 @@
 package com.banquito.core.integration.switchapi.service;
 
-import com.banquito.core.accounts.dto.response.SaldoCuentaResponse;
-import com.banquito.core.integration.switchapi.dto.request.LiquidacionServicioSwitchRequest;
-import com.banquito.core.integration.switchapi.dto.response.LiquidacionServicioSwitchResponse;
-import com.banquito.core.integration.switchapi.dto.response.ValidarEmpresaSwitchResponse;
-import com.banquito.core.transactions.dto.request.TransferenciaRequest;
-import com.banquito.core.transactions.dto.response.TransferenciaResponse;
+import com.banquito.core.accounts.dto.api.SaldoCuentaResponse;
+import com.banquito.core.integration.switchapi.dto.api.LiquidacionServicioSwitchRequest;
+import com.banquito.core.integration.switchapi.dto.api.LiquidacionServicioSwitchResponse;
+import com.banquito.core.integration.switchapi.dto.api.ValidarEmpresaSwitchResponse;
+import com.banquito.core.transactions.dto.api.TransferenciaRequest;
+import com.banquito.core.transactions.dto.api.TransferenciaResponse;
 
 import java.time.LocalDate;
 

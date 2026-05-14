@@ -1,6 +1,6 @@
 package com.banquito.core.integration.switchapi.service.impl;
 
-import com.banquito.core.accounts.dto.response.SaldoCuentaResponse;
+import com.banquito.core.accounts.dto.api.SaldoCuentaResponse;
 import com.banquito.core.accounts.enums.EstadoCuentaEnum;
 import com.banquito.core.accounts.mapper.CuentaMapper;
 import com.banquito.core.accounts.service.CuentaService;
@@ -10,15 +10,16 @@ import com.banquito.core.customers.enums.EstadoClienteEnum;
 import com.banquito.core.customers.enums.TipoClienteEnum;
 import com.banquito.core.customers.enums.TipoIdentificacionEnum;
 import com.banquito.core.customers.repository.ClienteRepository;
-import com.banquito.core.integration.switchapi.dto.request.LiquidacionServicioSwitchRequest;
-import com.banquito.core.integration.switchapi.dto.response.LiquidacionServicioSwitchResponse;
-import com.banquito.core.integration.switchapi.dto.response.ValidarEmpresaSwitchResponse;
+import com.banquito.core.integration.switchapi.dto.api.LiquidacionServicioSwitchRequest;
+import com.banquito.core.integration.switchapi.dto.api.LiquidacionServicioSwitchResponse;
+import com.banquito.core.integration.switchapi.dto.api.ValidarEmpresaSwitchResponse;
+import com.banquito.core.integration.switchapi.mapper.IntegracionSwitchMapper;
 import com.banquito.core.integration.switchapi.service.IntegracionSwitchService;
 import com.banquito.core.parameters.service.FeriadoService;
 import com.banquito.core.shared.enums.CanalOrigenEnum;
 import com.banquito.core.shared.exception.ValidationException;
-import com.banquito.core.transactions.dto.request.TransferenciaRequest;
-import com.banquito.core.transactions.dto.response.TransferenciaResponse;
+import com.banquito.core.transactions.dto.api.TransferenciaRequest;
+import com.banquito.core.transactions.dto.api.TransferenciaResponse;
 import com.banquito.core.transactions.enums.TipoMovimientoEnum;
 import com.banquito.core.transactions.service.MotorTransaccionalService;
 import lombok.RequiredArgsConstructor;
@@ -55,15 +56,10 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
                     ruc,
                     ResultadoAuditoriaEnum.RECHAZADO,
                     CanalOrigenEnum.SWITCH,
-                    "{\"ruc\":\"" + ruc + "\",\"existe\":false,\"motivo\":\"NO_EXISTE\"}"
+                    "{\"ruc\":\"" + ruc + "\",\"existe\":false,\"habilitada\":false,\"motivo\":\"NO_EXISTE\"}"
             );
 
-            return new ValidarEmpresaSwitchResponse(
-                    ruc,
-                    false,
-                    null,
-                    false
-            );
+            return IntegracionSwitchMapper.toEmpresaNoExisteResponse(ruc);
         }
 
         var cliente = clienteOptional.get();
@@ -71,7 +67,6 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
         boolean esJuridico = cliente.getTipoCliente() == TipoClienteEnum.JURIDICO;
         boolean estaActivo = cliente.getEstado() == EstadoClienteEnum.ACTIVO;
         boolean activoPagosMasivos = Boolean.TRUE.equals(cliente.getActivoPagosMasivos());
-
         boolean habilitada = esJuridico && estaActivo && activoPagosMasivos;
 
         auditoriaService.registrarEvento(
@@ -89,9 +84,8 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
                         ",\"habilitada\":" + habilitada + "}"
         );
 
-        return new ValidarEmpresaSwitchResponse(
+        return IntegracionSwitchMapper.toEmpresaExisteResponse(
                 ruc,
-                true,
                 cliente.getEstado().name(),
                 activoPagosMasivos
         );
@@ -100,10 +94,13 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
     @Override
     @Transactional(readOnly = true)
     public SaldoCuentaResponse consultarDisponibilidad(String numeroCuenta) {
-        return CuentaMapper.toSaldoResponse(cuentaService.obtenerPorNumero(numeroCuenta));
+        return CuentaMapper.toSaldoResponse(
+                cuentaService.obtenerPorNumero(numeroCuenta)
+        );
     }
 
     @Override
+    @Transactional
     public TransferenciaResponse ejecutarTransferencia(TransferenciaRequest request) {
         return motorTransaccionalService.ejecutarTransferencia(request);
     }
@@ -148,11 +145,12 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
                 "{\"cuentaMatriz\":\"" + request.cuentaMatriz() +
                         "\",\"subtotalComision\":" + request.subtotalComision() +
                         ",\"montoIva\":" + request.montoIva() +
-                        ",\"totalDebitado\":" + request.totalDebitado() + "}"
+                        ",\"totalDebitado\":" + request.totalDebitado() +
+                        ",\"codigoCuentaIngresos\":\"" + request.codigoCuentaIngresos() +
+                        "\",\"codigoCuentaIva\":\"" + request.codigoCuentaIva() + "\"}"
         );
 
-        return new LiquidacionServicioSwitchResponse(
-                "APLICADA",
+        return IntegracionSwitchMapper.toLiquidacionAplicadaResponse(
                 uuidDebitoMatriz,
                 uuidCreditoIngresos,
                 uuidCreditoIva,
