@@ -1,6 +1,7 @@
 package com.banquito.core.accounts.service.impl;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -35,6 +36,11 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class CuentaServiceImpl implements CuentaService {
+
+    private static final String MODULO_ACCOUNTS = "ACCOUNTS";
+    private static final String ENTIDAD_CUENTA = "CUENTA";
+    private static final String ENTIDAD_BLOQUEO_CUENTA = "BLOQUEO_CUENTA";
+
     private final CuentaRepository cuentaRepository;
     private final ClienteRepository clienteRepository;
     private final SucursalRepository sucursalRepository;
@@ -47,6 +53,18 @@ public class CuentaServiceImpl implements CuentaService {
     @Override
     public List<CuentaResponse> listar() {
         return cuentaRepository.findAll().stream().map(CuentaMapper::toResponse).toList();
+    }
+
+    @Override
+    @Transactional
+    public List<CuentaResponse> listarPorCliente(Integer clienteId) {
+        clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado: " + clienteId));
+
+        return cuentaRepository.findByClienteId(clienteId)
+                .stream()
+                .map(CuentaMapper::toResponse)
+                .toList();
     }
 
     @Override
@@ -95,12 +113,12 @@ public class CuentaServiceImpl implements CuentaService {
         Cuenta cuentaGuardada = cuentaRepository.save(c);
 
         auditoriaService.registrarEvento(
-                "ACCOUNTS",
+                MODULO_ACCOUNTS,
                 "CREAR_CUENTA",
-                "CUENTA",
+                ENTIDAD_CUENTA,
                 cuentaGuardada.getId().toString(),
                 ResultadoAuditoriaEnum.EXITOSO,
-                CanalOrigenEnum.WEB,
+                CanalOrigenEnum.CORE,
                 "{\"numeroCuenta\":\"" + cuentaGuardada.getNumeroCuenta() + "\"}"
         );
 
@@ -113,7 +131,8 @@ public class CuentaServiceImpl implements CuentaService {
         Cuenta cuenta = obtenerEntidad(id);
         var anterior = cuenta.getEstado();
         cuenta.setEstado(request.nuevoEstado());
-        var usuario = request.usuarioCoreId() == null ? null : usuarioCoreRepository.findById(request.usuarioCoreId()).orElse(null);
+        var usuario = usuarioCoreRepository.findById(request.usuarioCoreId())
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario core no encontrado: " + request.usuarioCoreId()));
         HistorialEstadoCuenta historial = new HistorialEstadoCuenta();
         historial.setCuenta(cuenta);
         historial.setEstadoAnterior(anterior);
@@ -125,12 +144,12 @@ public class CuentaServiceImpl implements CuentaService {
         Cuenta cuentaGuardada = cuentaRepository.save(cuenta);
 
         auditoriaService.registrarEvento(
-                "ACCOUNTS",
+                MODULO_ACCOUNTS,
                 "CAMBIAR_ESTADO_CUENTA",
-                "CUENTA",
+                ENTIDAD_CUENTA,
                 cuentaGuardada.getId().toString(),
                 ResultadoAuditoriaEnum.EXITOSO,
-                CanalOrigenEnum.WEB,
+                CanalOrigenEnum.CORE,
                 "{\"estadoAnterior\":\"" + anterior + "\",\"estadoNuevo\":\"" + request.nuevoEstado() + "\"}"
         );
 
@@ -141,7 +160,16 @@ public class CuentaServiceImpl implements CuentaService {
     @Transactional
     public void bloquear(Integer id, BloquearCuentaRequest request) {
         Cuenta cuenta = obtenerEntidad(id);
-        var usuario = request.usuarioCoreId() == null ? null : usuarioCoreRepository.findById(request.usuarioCoreId()).orElse(null);
+
+        if (cuenta.getSaldoDisponible().compareTo(request.montoBloqueado()) < 0) {
+            throw new ValidationException("Saldo disponible insuficiente para bloquear el monto solicitado");
+        }
+
+        var usuario = usuarioCoreRepository.findById(request.usuarioCoreId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Usuario core no encontrado: " + request.usuarioCoreId()
+                ));
+
         BloqueoCuenta bloqueo = new BloqueoCuenta();
         bloqueo.setCuenta(cuenta);
         bloqueo.setMontoBloqueado(request.montoBloqueado());
@@ -150,16 +178,19 @@ public class CuentaServiceImpl implements CuentaService {
         bloqueo.setEstado(EstadoBloqueoCuentaEnum.ACTIVO);
         bloqueo.setUsuarioCore(usuario);
         bloqueo.setObservaciones(request.observaciones());
-        bloqueoRepository.save(bloqueo);
+
         cuenta.setSaldoDisponible(cuenta.getSaldoDisponible().subtract(request.montoBloqueado()));
+
+        bloqueoRepository.save(bloqueo);
         cuentaRepository.save(cuenta);
+
         auditoriaService.registrarEvento(
-                "ACCOUNTS",
+                MODULO_ACCOUNTS,
                 "BLOQUEAR_CUENTA",
-                "CUENTA",
+                ENTIDAD_CUENTA,
                 cuenta.getId().toString(),
                 ResultadoAuditoriaEnum.EXITOSO,
-                CanalOrigenEnum.WEB,
+                CanalOrigenEnum.CORE,
                 "{\"montoBloqueado\":" + request.montoBloqueado() + "}"
         );
     }
@@ -178,16 +209,17 @@ public class CuentaServiceImpl implements CuentaService {
 
         bloqueo.setEstado(EstadoBloqueoCuentaEnum.LIBERADO);
         cuenta.setSaldoDisponible(cuenta.getSaldoDisponible().add(bloqueo.getMontoBloqueado()));
+        bloqueo.setFechaLiberacion(LocalDateTime.now());
 
         bloqueoRepository.save(bloqueo);
         cuentaRepository.save(cuenta);
         auditoriaService.registrarEvento(
-                "ACCOUNTS",
+                MODULO_ACCOUNTS,
                 "LIBERAR_BLOQUEO_CUENTA",
-                "BLOQUEO_CUENTA",
+                ENTIDAD_BLOQUEO_CUENTA,
                 idBloqueo.toString(),
                 ResultadoAuditoriaEnum.EXITOSO,
-                CanalOrigenEnum.WEB,
+                CanalOrigenEnum.CORE,
                 "{\"cuentaId\":\"" + cuenta.getId() + "\",\"montoLiberado\":" + bloqueo.getMontoBloqueado() + "}"
         );
     }

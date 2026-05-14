@@ -1,7 +1,7 @@
 package com.banquito.core.customers.controller;
 
-import com.banquito.core.customers.dto.api.ClienteRequest;
 import com.banquito.core.customers.dto.api.ClienteEstadoRequest;
+import com.banquito.core.customers.dto.api.ClienteRequest;
 import com.banquito.core.customers.dto.api.ClienteValidacionResponse;
 import com.banquito.core.customers.mapper.ClienteMapper;
 import com.banquito.core.customers.service.ClienteService;
@@ -14,40 +14,44 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/core/clientes")
 @RequiredArgsConstructor
 public class ClienteController {
+
     private final ClienteService service;
-    
+
     @GetMapping
     public ApiResponse<?> listar() {
-        return ApiResponse.ok("Clientes obtenidos", service.listar()); 
+        return ApiResponse.ok("Clientes obtenidos", service.listar());
     }
-    
+
     @GetMapping("/{id}")
     public ApiResponse<?> obtener(@PathVariable Integer id) {
-        return ApiResponse.ok("Cliente obtenido", service.obtener(id)); 
+        return ApiResponse.ok("Cliente obtenido", service.obtener(id));
     }
-    
+
     @GetMapping("/identificacion/{identificacion}")
     public ApiResponse<?> obtenerPorIdentificacion(@PathVariable String identificacion) {
-        return ApiResponse.ok("Cliente obtenido", service.obtenerPorIdentificacion(identificacion)); 
+        return ApiResponse.ok("Cliente obtenido", service.obtenerPorIdentificacion(identificacion));
     }
-    
+
     @PostMapping
     public ApiResponse<?> crear(@Valid @RequestBody ClienteRequest request) {
-        return ApiResponse.ok("Cliente creado", service.crear(request)); 
+        return ApiResponse.ok("Cliente creado", service.crear(request));
     }
-    
+
     @PatchMapping("/{id}/estado")
-    public ApiResponse<?> cambiarEstado(@PathVariable Integer id, @RequestBody ClienteEstadoRequest request) {
+    public ApiResponse<?> cambiarEstado(
+            @PathVariable Integer id,
+            @Valid @RequestBody ClienteEstadoRequest request
+    ) {
         return ApiResponse.ok("Estado actualizado", service.cambiarEstado(id, request.estado()));
     }
-    
+
     @GetMapping("/ruc/{ruc}/validacion-pagos-masivos")
     public ApiResponse<?> validarEmpresaParaPagosMasivos(@PathVariable String ruc) {
         boolean esValida = service.validarEmpresaParaPagosMasivos(ruc);
-        String mensaje = esValida ? "Empresa válida para pagos masivos" : "Empresa no válida para pagos masivos";
-        String motivo = esValida ? null : "La empresa no está activa o no tiene habilitados pagos masivos";
-        
+        String mensaje = esValida ? "Empresa valida para pagos masivos" : "Empresa no valida para pagos masivos";
+        String motivo = esValida ? null : "La empresa no esta activa o no tiene habilitados pagos masivos";
+
         ClienteValidacionResponse response = ClienteMapper.toValidacionResponse(ruc, esValida, mensaje, motivo);
-        return ApiResponse.ok("Validación completada", response);
+        return ApiResponse.ok("Validacion completada", response);
     }
 }

@@ -21,7 +21,7 @@ import com.banquito.core.shared.exception.ValidationException;
 import com.banquito.core.transactions.dto.api.TransferenciaRequest;
 import com.banquito.core.transactions.dto.api.TransferenciaResponse;
 import com.banquito.core.transactions.enums.TipoMovimientoEnum;
-import com.banquito.core.transactions.service.MotorTransaccionalService;
+import com.banquito.core.transactions.service.TransaccionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,9 +34,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
 
+    private static final String MODULO_INTEGRACION_SWITCH = "INTEGRATION_SWITCH";
+
     private final ClienteRepository clienteRepository;
     private final CuentaService cuentaService;
-    private final MotorTransaccionalService motorTransaccionalService;
+    private final TransaccionService transaccionService;
     private final FeriadoService feriadoService;
     private final AuditoriaService auditoriaService;
 
@@ -50,13 +52,13 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
 
         if (clienteOptional.isEmpty()) {
             auditoriaService.registrarEvento(
-                    "INTEGRATION_SWITCH",
+                    MODULO_INTEGRACION_SWITCH,
                     "VALIDAR_EMPRESA",
                     "CLIENTE",
                     ruc,
                     ResultadoAuditoriaEnum.RECHAZADO,
                     CanalOrigenEnum.SWITCH,
-                    "{\"ruc\":\"" + ruc + "\",\"existe\":false,\"habilitada\":false,\"motivo\":\"NO_EXISTE\"}"
+                    "{\"ruc\":\"" + sanitizarJson(ruc) + "\",\"existe\":false,\"habilitada\":false,\"motivo\":\"NO_EXISTE\"}"
             );
 
             return IntegracionSwitchMapper.toEmpresaNoExisteResponse(ruc);
@@ -70,13 +72,13 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
         boolean habilitada = esJuridico && estaActivo && activoPagosMasivos;
 
         auditoriaService.registrarEvento(
-                "INTEGRATION_SWITCH",
+                MODULO_INTEGRACION_SWITCH,
                 "VALIDAR_EMPRESA",
                 "CLIENTE",
                 cliente.getId().toString(),
                 habilitada ? ResultadoAuditoriaEnum.EXITOSO : ResultadoAuditoriaEnum.RECHAZADO,
                 CanalOrigenEnum.SWITCH,
-                "{\"ruc\":\"" + ruc +
+                "{\"ruc\":\"" + sanitizarJson(ruc) +
                         "\",\"existe\":true" +
                         ",\"tipoCliente\":\"" + cliente.getTipoCliente() +
                         "\",\"estado\":\"" + cliente.getEstado() +
@@ -102,7 +104,8 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
     @Override
     @Transactional
     public TransferenciaResponse ejecutarTransferencia(TransferenciaRequest request) {
-        return motorTransaccionalService.ejecutarTransferencia(request);
+        TransferenciaRequest requestSwitch = asegurarCanalSwitch(request);
+        return transaccionService.ejecutarTransferencia(requestSwitch);
     }
 
     @Override
@@ -110,14 +113,14 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
     public LiquidacionServicioSwitchResponse liquidarServicio(LiquidacionServicioSwitchRequest request) {
         validarTotalLiquidacion(request);
 
-        UUID uuidDebitoMatriz = motorTransaccionalService.debitarCuentaMatrizLiquidacion(
+        UUID uuidDebitoMatriz = transaccionService.debitarCuentaMatrizLiquidacion(
                 request.cuentaMatriz(),
                 request.totalDebitado(),
                 request.uuidGrupoOperacion(),
                 request.referenciaExterna()
         );
 
-        UUID uuidCreditoIngresos = motorTransaccionalService.registrarMovimientoInstitucional(
+        UUID uuidCreditoIngresos = transaccionService.registrarMovimientoInstitucional(
                 request.codigoCuentaIngresos(),
                 "INGRESO_SERVICIO_MASIVO",
                 TipoMovimientoEnum.CREDITO,
@@ -126,7 +129,7 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
                 request.referenciaExterna()
         );
 
-        UUID uuidCreditoIva = motorTransaccionalService.registrarMovimientoInstitucional(
+        UUID uuidCreditoIva = transaccionService.registrarMovimientoInstitucional(
                 request.codigoCuentaIva(),
                 "IVA_SERVICIO_MASIVO",
                 TipoMovimientoEnum.CREDITO,
@@ -136,18 +139,18 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
         );
 
         auditoriaService.registrarEvento(
-                "INTEGRATION_SWITCH",
+                MODULO_INTEGRACION_SWITCH,
                 "LIQUIDAR_COMISION_IVA",
                 "LIQUIDACION_SERVICIO",
                 request.uuidGrupoOperacion().toString(),
                 ResultadoAuditoriaEnum.EXITOSO,
                 CanalOrigenEnum.SWITCH,
-                "{\"cuentaMatriz\":\"" + request.cuentaMatriz() +
+                "{\"cuentaMatriz\":\"" + sanitizarJson(request.cuentaMatriz()) +
                         "\",\"subtotalComision\":" + request.subtotalComision() +
                         ",\"montoIva\":" + request.montoIva() +
                         ",\"totalDebitado\":" + request.totalDebitado() +
-                        ",\"codigoCuentaIngresos\":\"" + request.codigoCuentaIngresos() +
-                        "\",\"codigoCuentaIva\":\"" + request.codigoCuentaIva() + "\"}"
+                        ",\"codigoCuentaIngresos\":\"" + sanitizarJson(request.codigoCuentaIngresos()) +
+                        "\",\"codigoCuentaIva\":\"" + sanitizarJson(request.codigoCuentaIva()) + "\"}"
         );
 
         return IntegracionSwitchMapper.toLiquidacionAplicadaResponse(
@@ -176,11 +179,37 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
         return feriadoService.calcularSiguienteDiaHabil(fecha);
     }
 
+    private TransferenciaRequest asegurarCanalSwitch(TransferenciaRequest request) {
+        return new TransferenciaRequest(
+                request.cuentaOrigen(),
+                request.cuentaDestino(),
+                request.codigoSubtipo(),
+                request.monto(),
+                request.uuidOperacion(),
+                request.uuidGrupoOperacion(),
+                request.referenciaExterna(),
+                request.descripcion(),
+                CanalOrigenEnum.SWITCH,
+                request.fechaNegocio(),
+                request.usuarioCoreId(),
+                request.credencialWebId()
+        );
+    }
+
     private void validarTotalLiquidacion(LiquidacionServicioSwitchRequest request) {
         BigDecimal totalCalculado = request.subtotalComision().add(request.montoIva());
 
         if (totalCalculado.compareTo(request.totalDebitado()) != 0) {
             throw new ValidationException("El total debitado debe ser igual a subtotalComision + montoIva");
         }
+    }
+
+    private String sanitizarJson(String valor) {
+        if (valor == null) {
+            return "";
+        }
+
+        return valor.replace("\\", "\\\\")
+                .replace("\"", "\\\"");
     }
 }
