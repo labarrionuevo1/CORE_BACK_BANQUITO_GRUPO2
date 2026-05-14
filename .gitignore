@@ -7,5 +7,7 @@ target/
 .env
 *.log
 
+postman/outputs/
+
 .DS_Store
 Thumbs.db
