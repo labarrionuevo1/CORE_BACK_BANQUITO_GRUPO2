@@ -1,6 +1,7 @@
 package com.banquito.core.parameters.mapper;
 
 import com.banquito.core.parameters.dto.api.FeriadoResponse;
+import com.banquito.core.parameters.dto.api.DiaHabilResponse;
 import com.banquito.core.parameters.dto.api.ParametroCoreResponse;
 import com.banquito.core.parameters.model.Feriado;
 import com.banquito.core.parameters.model.ParametroCore;
@@ -14,5 +15,9 @@ public final class ParametroMapper {
     
     public static FeriadoResponse toResponse(Feriado f) {
         return new FeriadoResponse(f.getFechaFeriado(), f.getNombre(), f.getEsFinSemana(), f.getEstado());
+    }
+
+    public static DiaHabilResponse toDiaHabilResponse(java.time.LocalDate fechaOriginal, java.time.LocalDate siguienteDiaHabil, Integer diasCalculados, String mensaje) {
+        return new DiaHabilResponse(fechaOriginal, siguienteDiaHabil, diasCalculados, mensaje);
     }
 }
