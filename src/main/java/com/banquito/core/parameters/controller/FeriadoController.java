@@ -2,6 +2,7 @@ package com.banquito.core.parameters.controller;
 
 import com.banquito.core.parameters.dto.api.DiaHabilResponse;
 import com.banquito.core.parameters.service.FeriadoService;
+import com.banquito.core.parameters.mapper.ParametroMapper;
 import com.banquito.core.shared.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -31,7 +32,7 @@ public class FeriadoController {
         Integer diasCalculados = (int) java.time.temporal.ChronoUnit.DAYS.between(fecha, siguienteDiaHabil);
         String mensaje = String.format("Se calcularon %d días desde %s hasta %s", diasCalculados, fecha, siguienteDiaHabil);
         
-        DiaHabilResponse response = new DiaHabilResponse(fecha, siguienteDiaHabil, diasCalculados, mensaje);
+        DiaHabilResponse response = ParametroMapper.toDiaHabilResponse(fecha, siguienteDiaHabil, diasCalculados, mensaje);
         return ApiResponse.ok("Siguiente día hábil calculado", response);
     }
 }
