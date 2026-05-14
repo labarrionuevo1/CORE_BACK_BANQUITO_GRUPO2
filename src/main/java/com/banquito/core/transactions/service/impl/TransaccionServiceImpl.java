@@ -1,4 +1,4 @@
-package com.banquito.core.transactions.service;
+package com.banquito.core.transactions.service.impl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -33,6 +33,7 @@ import com.banquito.core.transactions.model.TransaccionInstitucional;
 import com.banquito.core.transactions.repository.SubtipoTransaccionRepository;
 import com.banquito.core.transactions.repository.TransaccionCuentaRepository;
 import com.banquito.core.transactions.repository.TransaccionInstitucionalRepository;
+import com.banquito.core.transactions.service.TransaccionService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class MotorTransaccionalService {
+public class TransaccionServiceImpl implements TransaccionService {
     private final CuentaRepository cuentaRepository;
     private final SubtipoTransaccionRepository subtipoRepository;
     private final TransaccionCuentaRepository transaccionCuentaRepository;
@@ -282,5 +283,5 @@ public class MotorTransaccionalService {
                 .orElseThrow(() -> new ResourceNotFoundException("Transacción no encontrada: " + uuid));
         return TransaccionMapper.toMovimientoResponse(transaccion);
     }
-    
+
 }

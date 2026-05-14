@@ -14,7 +14,7 @@ import com.banquito.core.shared.response.ApiResponse;
 import com.banquito.core.transactions.dto.api.MovimientoCuentaResponse;
 import com.banquito.core.transactions.dto.api.TransferenciaRequest;
 import com.banquito.core.transactions.dto.api.TransferenciaResponse;
-import com.banquito.core.transactions.service.MotorTransaccionalService;
+import com.banquito.core.transactions.service.TransaccionService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TransaccionController {
 
-    private final MotorTransaccionalService service;
+    private final TransaccionService service;
 
     @PostMapping("/transferencias")
     public ApiResponse<TransferenciaResponse> transferir(@Valid @RequestBody TransferenciaRequest request) {
