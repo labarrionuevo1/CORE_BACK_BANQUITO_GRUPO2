@@ -1,13 +1,22 @@
 package com.banquito.core.transactions.controller;
 
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.banquito.core.shared.response.ApiResponse;
+import com.banquito.core.transactions.dto.api.MovimientoCuentaResponse;
 import com.banquito.core.transactions.dto.api.TransferenciaRequest;
 import com.banquito.core.transactions.service.MotorTransaccionalService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/core/transacciones")
@@ -22,12 +31,12 @@ public class TransaccionController {
     }
 
     @GetMapping("/cuenta/{numeroCuenta}")
-    public ApiResponse<?> obtenerMovimientosPorCuenta(@PathVariable String numeroCuenta) {
+    public ApiResponse<List<MovimientoCuentaResponse>> obtenerMovimientosPorCuenta(@PathVariable String numeroCuenta) {
         return ApiResponse.ok("Movimientos obtenidos", service.obtenerMovimientosPorCuenta(numeroCuenta));
     }
 
     @GetMapping("/{uuid}")
-    public ApiResponse<?> obtenerPorUuid(@PathVariable UUID uuid) {
+    public ApiResponse<MovimientoCuentaResponse> obtenerPorUuid(@PathVariable UUID uuid) {
         return ApiResponse.ok("Transacción obtenida", service.obtenerPorUuid(uuid));
     }
 }
