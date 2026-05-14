@@ -1,4 +1,4 @@
-package com.banquito.core.accounts.dto.request;
+package com.banquito.core.accounts.dto.api;
 
 import jakarta.validation.constraints.NotNull;
 

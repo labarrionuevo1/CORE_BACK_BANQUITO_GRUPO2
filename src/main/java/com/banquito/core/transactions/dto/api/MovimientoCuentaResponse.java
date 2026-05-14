@@ -1,4 +1,4 @@
-package com.banquito.core.transactions.dto.response;
+package com.banquito.core.transactions.dto.api;
 
 import com.banquito.core.transactions.enums.TipoMovimientoEnum;
 

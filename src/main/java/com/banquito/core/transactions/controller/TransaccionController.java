@@ -1,7 +1,7 @@
 package com.banquito.core.transactions.controller;
 
 import com.banquito.core.shared.response.ApiResponse;
-import com.banquito.core.transactions.dto.request.TransferenciaRequest;
+import com.banquito.core.transactions.dto.api.TransferenciaRequest;
 import com.banquito.core.transactions.service.MotorTransaccionalService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

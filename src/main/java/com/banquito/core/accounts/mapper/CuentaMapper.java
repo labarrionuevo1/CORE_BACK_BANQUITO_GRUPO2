@@ -1,7 +1,7 @@
 package com.banquito.core.accounts.mapper;
 
-import com.banquito.core.accounts.dto.response.CuentaResponse;
-import com.banquito.core.accounts.dto.response.SaldoCuentaResponse;
+import com.banquito.core.accounts.dto.api.CuentaResponse;
+import com.banquito.core.accounts.dto.api.SaldoCuentaResponse;
 import com.banquito.core.accounts.model.Cuenta;
 
 public final class CuentaMapper {

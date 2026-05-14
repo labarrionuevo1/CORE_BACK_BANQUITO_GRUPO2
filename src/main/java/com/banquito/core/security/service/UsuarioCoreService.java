@@ -1,6 +1,6 @@
 package com.banquito.core.security.service;
 
-import com.banquito.core.security.dto.UsuarioCoreResponse;
+import com.banquito.core.security.dto.api.UsuarioCoreResponse;
 import com.banquito.core.security.enums.EstadoUsuarioCoreEnum;
 import com.banquito.core.security.enums.RolUsuarioCoreEnum;
 

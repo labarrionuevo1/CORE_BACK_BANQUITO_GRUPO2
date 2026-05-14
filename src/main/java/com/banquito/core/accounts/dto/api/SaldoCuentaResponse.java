@@ -1,4 +1,4 @@
-package com.banquito.core.accounts.dto.response;
+package com.banquito.core.accounts.dto.api;
 
 import com.banquito.core.accounts.enums.EstadoCuentaEnum;
 

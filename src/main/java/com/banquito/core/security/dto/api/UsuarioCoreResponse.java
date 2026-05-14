@@ -1,4 +1,4 @@
-package com.banquito.core.security.dto;
+package com.banquito.core.security.dto.api;
 
 import com.banquito.core.security.enums.EstadoUsuarioCoreEnum;
 import com.banquito.core.security.enums.RolUsuarioCoreEnum;

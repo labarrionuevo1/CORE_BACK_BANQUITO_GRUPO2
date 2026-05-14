@@ -1,10 +1,10 @@
 package com.banquito.core.accounts.service;
 
-import com.banquito.core.accounts.dto.request.BloquearCuentaRequest;
-import com.banquito.core.accounts.dto.request.CambiarEstadoCuentaRequest;
-import com.banquito.core.accounts.dto.request.CrearCuentaRequest;
-import com.banquito.core.accounts.dto.response.CuentaResponse;
-import com.banquito.core.accounts.dto.response.SaldoCuentaResponse;
+import com.banquito.core.accounts.dto.api.BloquearCuentaRequest;
+import com.banquito.core.accounts.dto.api.CambiarEstadoCuentaRequest;
+import com.banquito.core.accounts.dto.api.CrearCuentaRequest;
+import com.banquito.core.accounts.dto.api.CuentaResponse;
+import com.banquito.core.accounts.dto.api.SaldoCuentaResponse;
 import com.banquito.core.accounts.enums.EstadoBloqueoCuentaEnum;
 import com.banquito.core.accounts.mapper.CuentaMapper;
 import com.banquito.core.accounts.model.BloqueoCuenta;

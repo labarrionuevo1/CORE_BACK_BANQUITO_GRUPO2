@@ -1,4 +1,4 @@
-package com.banquito.core.integration.switchapi.dto.response;
+package com.banquito.core.integration.switchapi.dto.api;
 
 import java.util.UUID;
 
