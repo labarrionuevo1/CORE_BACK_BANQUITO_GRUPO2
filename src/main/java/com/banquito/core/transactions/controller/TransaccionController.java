@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.banquito.core.shared.response.ApiResponse;
 import com.banquito.core.transactions.dto.api.MovimientoCuentaResponse;
 import com.banquito.core.transactions.dto.api.TransferenciaRequest;
+import com.banquito.core.transactions.dto.api.TransferenciaResponse;
 import com.banquito.core.transactions.service.MotorTransaccionalService;
 
 import jakarta.validation.Valid;
@@ -26,7 +27,7 @@ public class TransaccionController {
     private final MotorTransaccionalService service;
 
     @PostMapping("/transferencias")
-    public ApiResponse<?> transferir(@Valid @RequestBody TransferenciaRequest request) {
+    public ApiResponse<TransferenciaResponse> transferir(@Valid @RequestBody TransferenciaRequest request) {
         return ApiResponse.ok("Transferencia procesada", service.ejecutarTransferencia(request));
     }
 
