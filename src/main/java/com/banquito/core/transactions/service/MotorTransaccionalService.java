@@ -1,33 +1,41 @@
 package com.banquito.core.transactions.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.banquito.core.accounts.enums.EstadoCuentaEnum;
 import com.banquito.core.accounts.model.Cuenta;
 import com.banquito.core.accounts.repository.CuentaRepository;
+import com.banquito.core.audit.enums.ResultadoAuditoriaEnum;
+import com.banquito.core.audit.service.AuditoriaService;
+import com.banquito.core.institutional.enums.EstadoCuentaInstitucionalEnum;
 import com.banquito.core.institutional.repository.CuentaInstitucionalRepository;
 import com.banquito.core.shared.enums.CanalOrigenEnum;
-import com.banquito.core.shared.exception.*;
-import lombok.extern.slf4j.Slf4j;
+import com.banquito.core.shared.exception.AccountNotActiveException;
+import com.banquito.core.shared.exception.IdempotencyException;
+import com.banquito.core.shared.exception.InsufficientFundsException;
+import com.banquito.core.shared.exception.ResourceNotFoundException;
+import com.banquito.core.shared.exception.ValidationException;
+import com.banquito.core.transactions.dto.api.MovimientoCuentaResponse;
 import com.banquito.core.transactions.dto.api.TransferenciaRequest;
 import com.banquito.core.transactions.dto.api.TransferenciaResponse;
 import com.banquito.core.transactions.enums.EstadoTransaccionEnum;
 import com.banquito.core.transactions.enums.TipoMovimientoEnum;
+import com.banquito.core.transactions.mapper.TransaccionMapper;
 import com.banquito.core.transactions.model.TransaccionCuenta;
 import com.banquito.core.transactions.model.TransaccionInstitucional;
 import com.banquito.core.transactions.repository.SubtipoTransaccionRepository;
 import com.banquito.core.transactions.repository.TransaccionCuentaRepository;
 import com.banquito.core.transactions.repository.TransaccionInstitucionalRepository;
-import com.banquito.core.audit.enums.ResultadoAuditoriaEnum;
-import com.banquito.core.audit.service.AuditoriaService;
-import com.banquito.core.institutional.enums.EstadoCuentaInstitucionalEnum;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.UUID;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
@@ -261,14 +269,18 @@ public class MotorTransaccionalService {
     }
 
     @Transactional(readOnly = true)
-    public List<TransaccionCuenta> obtenerMovimientosPorCuenta(String numeroCuenta) {
-        return transaccionCuentaRepository.findUltimosMovimientosPorNumeroCuenta(numeroCuenta);
+    public List<MovimientoCuentaResponse> obtenerMovimientosPorCuenta(String numeroCuenta) {
+        return transaccionCuentaRepository.findUltimosMovimientosPorNumeroCuenta(numeroCuenta)
+                .stream()
+                .map(TransaccionMapper::toMovimientoResponse)
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public TransaccionCuenta obtenerPorUuid(UUID uuid) {
-        return transaccionCuentaRepository.findByUuidTransaccion(uuid)
+    public MovimientoCuentaResponse obtenerPorUuid(UUID uuid) {
+        TransaccionCuenta transaccion = transaccionCuentaRepository.findByUuidTransaccion(uuid)
                 .orElseThrow(() -> new ResourceNotFoundException("Transacción no encontrada: " + uuid));
+        return TransaccionMapper.toMovimientoResponse(transaccion);
     }
     
 }
