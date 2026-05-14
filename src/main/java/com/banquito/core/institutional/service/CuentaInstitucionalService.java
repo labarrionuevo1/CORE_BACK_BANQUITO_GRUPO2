@@ -1,6 +1,6 @@
 package com.banquito.core.institutional.service;
 
-import com.banquito.core.institutional.dto.CuentaInstitucionalResponse;
+import com.banquito.core.institutional.dto.api.CuentaInstitucionalResponse;
 import com.banquito.core.institutional.mapper.CuentaInstitucionalMapper;
 import com.banquito.core.institutional.model.CuentaInstitucional;
 import com.banquito.core.institutional.repository.CuentaInstitucionalRepository;

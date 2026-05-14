@@ -1,6 +1,6 @@
 package com.banquito.core.security.mapper;
 
-import com.banquito.core.security.dto.CredencialWebResponse;
+import com.banquito.core.security.dto.api.CredencialWebResponse;
 import com.banquito.core.security.model.CredencialWeb;
 
 public class CredencialWebMapper {

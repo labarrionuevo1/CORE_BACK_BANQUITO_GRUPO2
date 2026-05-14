@@ -1,7 +1,7 @@
 package com.banquito.core.security.service;
 
-import com.banquito.core.security.dto.CredencialWebResponse;
-import com.banquito.core.security.dto.UsuarioCoreResponse;
+import com.banquito.core.security.dto.api.CredencialWebResponse;
+import com.banquito.core.security.dto.api.UsuarioCoreResponse;
 
 public interface AuthService {
     

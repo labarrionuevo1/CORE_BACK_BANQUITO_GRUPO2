@@ -1,4 +1,4 @@
-package com.banquito.core.transactions.dto.response;
+package com.banquito.core.transactions.dto.api;
 
 import java.math.BigDecimal;
 import java.util.UUID;

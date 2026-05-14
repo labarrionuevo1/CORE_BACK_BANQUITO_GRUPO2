@@ -1,9 +1,9 @@
 package com.banquito.core.integration.switchapi.controller;
 
-import com.banquito.core.integration.switchapi.dto.request.LiquidacionServicioSwitchRequest;
+import com.banquito.core.integration.switchapi.dto.api.LiquidacionServicioSwitchRequest;
 import com.banquito.core.integration.switchapi.service.IntegracionSwitchService;
 import com.banquito.core.shared.response.ApiResponse;
-import com.banquito.core.transactions.dto.request.TransferenciaRequest;
+import com.banquito.core.transactions.dto.api.TransferenciaRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

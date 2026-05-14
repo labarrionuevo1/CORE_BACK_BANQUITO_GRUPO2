@@ -1,4 +1,4 @@
-package com.banquito.core.transactions.dto.request;
+package com.banquito.core.transactions.dto.api;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
