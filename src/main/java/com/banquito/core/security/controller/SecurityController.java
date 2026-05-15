@@ -16,7 +16,7 @@ public class SecurityController {
     private final UsuarioCoreService usuarioCoreService;
     private final CredencialWebService credencialWebService;
     
-    @GetMapping("/usuarios-core/{username}")
+    @GetMapping("/usuarios-core/username/{username}")
     public ApiResponse<?> obtenerUsuarioCore(@PathVariable String username) {
         return ApiResponse.ok("Usuario core obtenido", usuarioCoreService.obtenerPorUsername(username));
     }
@@ -26,7 +26,7 @@ public class SecurityController {
         return ApiResponse.ok("Credencial web obtenida", credencialWebService.obtenerPorUsername(username));
     }
     
-    @GetMapping("/usuarios-core/{username}/validacion")
+    @GetMapping("/usuarios-core/username/{username}/validacion")
     public ApiResponse<?> validarUsuarioCore(
             @PathVariable String username,
             @RequestParam RolUsuarioCoreEnum rol,
