@@ -1,5 +1,14 @@
 package com.banquito.core.transactions.service.impl;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.banquito.core.accounts.enums.EstadoCuentaEnum;
 import com.banquito.core.accounts.model.Cuenta;
 import com.banquito.core.accounts.repository.CuentaRepository;
@@ -30,15 +39,8 @@ import com.banquito.core.transactions.repository.SubtipoTransaccionRepository;
 import com.banquito.core.transactions.repository.TransaccionCuentaRepository;
 import com.banquito.core.transactions.repository.TransaccionInstitucionalRepository;
 import com.banquito.core.transactions.service.TransaccionService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -140,6 +142,7 @@ public class TransaccionServiceImpl implements TransaccionService {
                 canalOrigen,
                 request.referenciaExterna(),
                 request.descripcion(),
+                request.numeroComprobante(),
                 usuarioCore,
                 credencialWeb
         );
@@ -158,6 +161,7 @@ public class TransaccionServiceImpl implements TransaccionService {
                 canalOrigen,
                 request.referenciaExterna(),
                 request.descripcion(),
+                request.numeroComprobante(),
                 usuarioCore,
                 credencialWeb
         );
@@ -229,6 +233,7 @@ public class TransaccionServiceImpl implements TransaccionService {
                 CanalOrigenEnum.SWITCH,
                 referenciaExterna,
                 "Debito de cuenta matriz por liquidacion de comision e IVA",
+                null,
                 null,
                 null
         );
@@ -418,9 +423,10 @@ public class TransaccionServiceImpl implements TransaccionService {
             BigDecimal saldoResultante,
             CanalOrigenEnum canalOrigen,
             String referenciaExterna,
-            String descripcion,
-            UsuarioCore usuarioCore,
-            CredencialWeb credencialWeb
+                        String descripcion,
+                        String numeroComprobante,
+                        UsuarioCore usuarioCore,
+                        CredencialWeb credencialWeb
     ) {
         TransaccionCuenta transaccion = new TransaccionCuenta();
         transaccion.setCuenta(cuenta);
@@ -435,6 +441,7 @@ public class TransaccionServiceImpl implements TransaccionService {
         transaccion.setCanalOrigen(canalOrigen);
         transaccion.setReferenciaExterna(referenciaExterna);
         transaccion.setDescripcion(descripcion);
+        transaccion.setNumeroComprobante(numeroComprobante);
         transaccion.setUsuarioCore(usuarioCore);
         transaccion.setCredencialWeb(credencialWeb);
 

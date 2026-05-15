@@ -1,23 +1,36 @@
 package com.banquito.core.transactions.model;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.UUID;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import com.banquito.core.accounts.model.Cuenta;
 import com.banquito.core.security.model.CredencialWeb;
 import com.banquito.core.security.model.UsuarioCore;
 import com.banquito.core.shared.enums.CanalOrigenEnum;
 import com.banquito.core.transactions.enums.EstadoTransaccionEnum;
 import com.banquito.core.transactions.enums.TipoMovimientoEnum;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.UUID;
-import java.util.Objects;
 
 @Getter
 @Setter
@@ -82,6 +95,9 @@ public class TransaccionCuenta {
     @CreationTimestamp
     @Column(name = "FECHA_TRANSACCION", nullable = false, updatable = false)
     private LocalDateTime fechaTransaccion;
+  
+    @Column(name = "NUMERO_COMPROBANTE", length = 20)
+    private String numeroComprobante;
 
     public TransaccionCuenta() {
     }

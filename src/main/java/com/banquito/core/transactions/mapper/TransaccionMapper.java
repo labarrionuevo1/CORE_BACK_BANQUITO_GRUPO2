@@ -1,11 +1,11 @@
 package com.banquito.core.transactions.mapper;
 
+import java.math.BigDecimal;
+import java.util.UUID;
+
 import com.banquito.core.transactions.dto.api.MovimientoCuentaResponse;
 import com.banquito.core.transactions.dto.api.TransferenciaResponse;
 import com.banquito.core.transactions.model.TransaccionCuenta;
-
-import java.math.BigDecimal;
-import java.util.UUID;
 
 public final class TransaccionMapper {
 
@@ -20,6 +20,7 @@ public final class TransaccionMapper {
                 transaccion.getMonto(),
                 transaccion.getSaldoResultante(),
                 transaccion.getDescripcion(),
+                transaccion.getNumeroComprobante(),
                 transaccion.getFechaTransaccion()
         );
     }
