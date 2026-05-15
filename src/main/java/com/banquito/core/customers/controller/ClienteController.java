@@ -37,6 +37,11 @@ public class ClienteController {
         return ApiResponse.ok("Cliente creado", service.crear(request));
     }
 
+    @PutMapping("/{id}")
+    public ApiResponse<?> actualizar(@PathVariable Integer id, @Valid @RequestBody ClienteRequest request) {
+        return ApiResponse.ok("Cliente actualizado", service.actualizar(id, request));
+    }
+
     @PatchMapping("/{id}/estado")
     public ApiResponse<?> cambiarEstado(
             @PathVariable Integer id,

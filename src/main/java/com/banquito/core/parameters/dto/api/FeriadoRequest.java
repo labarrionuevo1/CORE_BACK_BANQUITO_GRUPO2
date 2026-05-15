@@ -11,5 +11,7 @@ public record FeriadoRequest(
     LocalDate fecha,
 
     @NotBlank(message = "El nombre del feriado es obligatorio")
-    String nombre
+    String nombre,
+
+    String estado
 ) {}

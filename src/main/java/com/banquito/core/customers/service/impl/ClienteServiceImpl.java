@@ -112,6 +112,44 @@ public class ClienteServiceImpl implements ClienteService {
 
     @Override
     @Transactional
+    public ClienteResponse actualizar(Integer id, ClienteRequest request) {
+        Cliente cliente = obtenerEntidad(id);
+        validarDatosPorTipo(request);
+        validarSubtipoCliente(request.subtipoClienteId(), request.tipoCliente());
+
+        Cliente representante = obtenerRepresentanteLegal(request);
+
+        cliente.setSubtipoClienteId(request.subtipoClienteId());
+        cliente.setNombres(request.nombres());
+        cliente.setApellidos(request.apellidos());
+        cliente.setRazonSocial(request.razonSocial());
+        cliente.setFechaNacimiento(request.fechaNacimiento());
+        cliente.setFechaConstitucion(request.fechaConstitucion());
+        cliente.setRepresentanteLegal(representante);
+        cliente.setEmail(request.email());
+        cliente.setTelefonoMovil(request.telefonoMovil());
+        cliente.setDireccion(request.direccion());
+        cliente.setLatitud(request.latitud());
+        cliente.setLongitud(request.longitud());
+        cliente.setActivoPagosMasivos(Boolean.TRUE.equals(request.activoPagosMasivos()));
+
+        Cliente clienteActualizado = repository.save(cliente);
+
+        auditoriaService.registrarEvento(
+                MODULO_CUSTOMERS,
+                "ACTUALIZAR_CLIENTE",
+                "CLIENTE",
+                clienteActualizado.getId().toString(),
+                ResultadoAuditoriaEnum.EXITOSO,
+                CanalOrigenEnum.CORE,
+                "Cliente actualizado"
+        );
+
+        return ClienteMapper.toResponse(clienteActualizado);
+    }
+
+    @Override
+    @Transactional
     public ClienteResponse cambiarEstado(Integer id, EstadoClienteEnum nuevoEstado) {
         Cliente cliente = obtenerEntidad(id);
         EstadoClienteEnum estadoAnterior = cliente.getEstado();

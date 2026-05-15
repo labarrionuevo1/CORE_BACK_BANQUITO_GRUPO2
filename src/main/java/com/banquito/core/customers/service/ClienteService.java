@@ -18,6 +18,8 @@ public interface ClienteService {
     ClienteResponse obtenerPorIdentificacion(String identificacion);
 
     ClienteResponse crear(ClienteRequest request);
+
+    ClienteResponse actualizar(Integer id, ClienteRequest request);
     
     ClienteResponse cambiarEstado(Integer id, EstadoClienteEnum nuevoEstado);
     
