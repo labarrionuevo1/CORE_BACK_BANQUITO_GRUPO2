@@ -83,6 +83,7 @@ public class TransaccionServiceImpl implements TransaccionService {
 
     private TransferenciaResponse ejecutarTransferenciaInterna(TransferenciaRequest request) {
         validarActorTransaccional(request);
+        validarCuentasDiferentes(request);
 
         Cuenta origen = cuentaRepository.findByNumeroCuenta(request.cuentaOrigen())
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -360,7 +361,15 @@ public class TransaccionServiceImpl implements TransaccionService {
 
     private void validarActorTransaccional(TransferenciaRequest request) {
         if (request.usuarioCoreId() != null && request.credencialWebId() != null) {
-            throw new ValidationException("La transaccion no puede tener usuarioCoreId y credencialWebId al mismo tiempo");
+            throw new ValidationException("La transacción no puede tener usuarioCoreId y credencialWebId al mismo tiempo");
+        }
+    }
+
+    private void validarCuentasDiferentes(TransferenciaRequest request) {
+        if (request.cuentaOrigen() != null &&
+                request.cuentaDestino() != null &&
+                request.cuentaOrigen().equals(request.cuentaDestino())) {
+            throw new ValidationException("La cuenta origen y la cuenta destino no pueden ser iguales");
         }
     }
 
