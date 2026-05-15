@@ -38,4 +38,9 @@ public class SucursalController {
     public ApiResponse<?> crear(@Valid @RequestBody SucursalRequest request) {
         return ApiResponse.ok("Sucursal creada", service.crear(request)); 
     }
+
+    @PutMapping("/{id}")
+    public ApiResponse<?> actualizar(@PathVariable Integer id, @Valid @RequestBody SucursalRequest request) {
+        return ApiResponse.ok("Sucursal actualizada", service.actualizar(id, request));
+    }
 }

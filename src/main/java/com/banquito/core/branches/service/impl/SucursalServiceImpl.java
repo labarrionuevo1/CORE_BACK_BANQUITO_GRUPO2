@@ -100,6 +100,34 @@ public class SucursalServiceImpl implements SucursalService {
         return SucursalMapper.toResponse(sucursalGuardada);
     }
 
+    @Override
+    @Transactional
+    public SucursalResponse actualizar(Integer id, SucursalRequest request) {
+        Sucursal sucursal = obtenerEntidad(id);
+        
+        sucursal.setNombre(request.nombre());
+        sucursal.setCiudad(request.ciudad());
+        sucursal.setDireccion(request.direccion());
+        
+        if (request.estado() != null) {
+            sucursal.setEstado(EstadoSucursalEnum.valueOf(request.estado()));
+        }
+
+        Sucursal sucursalActualizada = repository.save(sucursal);
+
+        auditoriaService.registrarEvento(
+                MODULO_BRANCHES,
+                "ACTUALIZAR_SUCURSAL",
+                "SUCURSAL",
+                sucursalActualizada.getId().toString(),
+                ResultadoAuditoriaEnum.EXITOSO,
+                CanalOrigenEnum.CORE,
+                "{\"nombre\":\"" + sanitizarJson(sucursalActualizada.getNombre()) + "\"}"
+        );
+
+        return SucursalMapper.toResponse(sucursalActualizada);
+    }
+
     private String sanitizarJson(String valor) {
         if (valor == null) {
             return "";

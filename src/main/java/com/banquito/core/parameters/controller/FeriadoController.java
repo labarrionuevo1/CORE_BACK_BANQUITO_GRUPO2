@@ -1,9 +1,11 @@
 package com.banquito.core.parameters.controller;
 
 import com.banquito.core.parameters.dto.api.DiaHabilResponse;
+import com.banquito.core.parameters.dto.api.FeriadoRequest;
 import com.banquito.core.parameters.service.FeriadoService;
 import com.banquito.core.parameters.mapper.ParametroMapper;
 import com.banquito.core.shared.response.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -34,5 +36,10 @@ public class FeriadoController {
         
         DiaHabilResponse response = ParametroMapper.toDiaHabilResponse(fecha, siguienteDiaHabil, diasCalculados, mensaje);
         return ApiResponse.ok("Siguiente día hábil calculado", response);
+    }
+
+    @PostMapping
+    public ApiResponse<?> crear(@Valid @RequestBody FeriadoRequest request) {
+        return ApiResponse.ok("Feriado creado", service.crear(request));
     }
 }
