@@ -15,5 +15,9 @@ public interface FeriadoService {
     LocalDate calcularSiguienteDiaHabil(LocalDate fecha);
 
     FeriadoResponse crear(FeriadoRequest request);
+
+    FeriadoResponse actualizar(LocalDate fecha, FeriadoRequest request);
+
+    void eliminar(LocalDate fecha);
     
 }

@@ -42,4 +42,15 @@ public class FeriadoController {
     public ApiResponse<?> crear(@Valid @RequestBody FeriadoRequest request) {
         return ApiResponse.ok("Feriado creado", service.crear(request));
     }
+
+    @PutMapping("/{fecha}")
+    public ApiResponse<?> actualizar(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fecha, @Valid @RequestBody FeriadoRequest request) {
+        return ApiResponse.ok("Feriado actualizado", service.actualizar(fecha, request));
+    }
+
+    @DeleteMapping("/{fecha}")
+    public ApiResponse<?> eliminar(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fecha) {
+        service.eliminar(fecha);
+        return ApiResponse.ok("Feriado eliminado", null);
+    }
 }

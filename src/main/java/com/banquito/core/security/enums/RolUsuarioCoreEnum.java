@@ -8,7 +8,8 @@ public enum RolUsuarioCoreEnum {
     SUPERVISOR_AGENCIA("SUPERVISOR_AGENCIA"),
     ADMIN_CORE("ADMIN_CORE"),
     AUDITOR("AUDITOR"),
-    SISTEMA("SISTEMA");
+    SISTEMA("SISTEMA"),
+    OPERADOR("OPERADOR");
 
     private final String value;
 

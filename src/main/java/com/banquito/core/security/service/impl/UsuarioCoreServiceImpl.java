@@ -20,6 +20,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UsuarioCoreServiceImpl implements UsuarioCoreService {
@@ -30,6 +32,22 @@ public class UsuarioCoreServiceImpl implements UsuarioCoreService {
     private final PasswordEncoder passwordEncoder;
     private final AuditoriaService auditoriaService;
     private final SucursalService sucursalService;
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UsuarioCoreResponse> listar() {
+        return repository.findAll().stream()
+                .map(SeguridadMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UsuarioCoreResponse obtener(Integer id) {
+        return repository.findById(id)
+                .map(SeguridadMapper::toResponse)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario core no encontrado: " + id));
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -86,6 +104,64 @@ public class UsuarioCoreServiceImpl implements UsuarioCoreService {
                 ResultadoAuditoriaEnum.EXITOSO,
                 CanalOrigenEnum.CORE,
                 "{\"usuario\":\"" + usuarioGuardado.getUsuario() + "\"}"
+        );
+
+        return SeguridadMapper.toResponse(usuarioGuardado);
+    }
+
+    @Override
+    @Transactional
+    public UsuarioCoreResponse actualizar(Integer id, UsuarioCoreRequest request) {
+        UsuarioCore usuario = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario core no encontrado: " + id));
+
+        usuario.setNombreCompleto(request.nombreCompleto());
+        usuario.setRol(RolUsuarioCoreEnum.valueOf(request.rol()));
+
+        if (request.sucursalId() != null) {
+            Sucursal sucursal = sucursalService.obtenerEntidad(request.sucursalId());
+            usuario.setSucursal(sucursal);
+        } else {
+            usuario.setSucursal(null);
+        }
+
+        if (request.contrasena() != null && !request.contrasena().isEmpty()) {
+            usuario.setPasswordHash(passwordEncoder.encode(request.contrasena()));
+        }
+
+        UsuarioCore usuarioActualizado = repository.save(usuario);
+
+        auditoriaService.registrarEvento(
+                MODULO_SECURITY,
+                "ACTUALIZAR_USUARIO_CORE",
+                "USUARIO_CORE",
+                usuarioActualizado.getId().toString(),
+                ResultadoAuditoriaEnum.EXITOSO,
+                CanalOrigenEnum.CORE,
+                "Usuario core actualizado"
+        );
+
+        return SeguridadMapper.toResponse(usuarioActualizado);
+    }
+
+    @Override
+    @Transactional
+    public UsuarioCoreResponse cambiarEstado(Integer id, EstadoUsuarioCoreEnum nuevoEstado) {
+        UsuarioCore usuario = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario core no encontrado: " + id));
+        
+        EstadoUsuarioCoreEnum estadoAnterior = usuario.getEstado();
+        usuario.setEstado(nuevoEstado);
+        UsuarioCore usuarioGuardado = repository.save(usuario);
+
+        auditoriaService.registrarEvento(
+                MODULO_SECURITY,
+                "CAMBIAR_ESTADO_USUARIO_CORE",
+                "USUARIO_CORE",
+                usuarioGuardado.getId().toString(),
+                ResultadoAuditoriaEnum.EXITOSO,
+                CanalOrigenEnum.CORE,
+                "{\"estadoAnterior\":\"" + estadoAnterior + "\",\"estadoNuevo\":\"" + nuevoEstado + "\"}"
         );
 
         return SeguridadMapper.toResponse(usuarioGuardado);
