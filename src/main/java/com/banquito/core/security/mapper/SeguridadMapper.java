@@ -1,7 +1,9 @@
 package com.banquito.core.security.mapper;
 
 import com.banquito.core.security.dto.api.CredencialWebResponse;
+import com.banquito.core.security.dto.api.UsuarioCoreRequest;
 import com.banquito.core.security.dto.api.UsuarioCoreResponse;
+import com.banquito.core.security.enums.RolUsuarioCoreEnum;
 import com.banquito.core.security.model.CredencialWeb;
 import com.banquito.core.security.model.UsuarioCore;
 
@@ -50,5 +52,17 @@ public final class SeguridadMapper {
                 usuario.getFechaCreacion(),
                 usuario.getFechaActualizacion()
         );
+    }
+
+    public static UsuarioCore toEntity(UsuarioCoreRequest request) {
+        if (request == null) {
+            return null;
+        }
+
+        UsuarioCore usuario = new UsuarioCore();
+        usuario.setUsuario(request.usuario());
+        usuario.setNombreCompleto(request.nombreCompleto());
+        usuario.setRol(RolUsuarioCoreEnum.valueOf(request.rol()));
+        return usuario;
     }
 }

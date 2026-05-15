@@ -19,5 +19,7 @@ public interface SucursalService {
     SucursalResponse obtenerPorCodigo(String codigoSucursal);
     
     SucursalResponse crear(SucursalRequest request);
+
+    SucursalResponse actualizar(Integer id, SucursalRequest request);
     
 }

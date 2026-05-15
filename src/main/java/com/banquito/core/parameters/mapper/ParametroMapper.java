@@ -1,5 +1,6 @@
 package com.banquito.core.parameters.mapper;
 
+import com.banquito.core.parameters.dto.api.FeriadoRequest;
 import com.banquito.core.parameters.dto.api.FeriadoResponse;
 import com.banquito.core.parameters.dto.api.DiaHabilResponse;
 import com.banquito.core.parameters.dto.api.ParametroCoreResponse;
@@ -19,5 +20,16 @@ public final class ParametroMapper {
 
     public static DiaHabilResponse toDiaHabilResponse(java.time.LocalDate fechaOriginal, java.time.LocalDate siguienteDiaHabil, Integer diasCalculados, String mensaje) {
         return new DiaHabilResponse(fechaOriginal, siguienteDiaHabil, diasCalculados, mensaje);
+    }
+
+    public static Feriado toEntity(FeriadoRequest request) {
+        if (request == null) {
+            return null;
+        }
+
+        Feriado feriado = new Feriado();
+        feriado.setFechaFeriado(request.fecha());
+        feriado.setNombre(request.nombre());
+        return feriado;
     }
 }

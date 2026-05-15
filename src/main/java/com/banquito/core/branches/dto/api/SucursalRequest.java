@@ -6,5 +6,6 @@ public record SucursalRequest(
         @NotBlank String codigoSucursal,
         @NotBlank String nombre,
         @NotBlank String ciudad,
-        String direccion
+        String direccion,
+        String estado
 ) {}

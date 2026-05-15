@@ -1,5 +1,10 @@
 package com.banquito.core.security.service.impl;
 
+import com.banquito.core.audit.enums.ResultadoAuditoriaEnum;
+import com.banquito.core.audit.service.AuditoriaService;
+import com.banquito.core.branches.model.Sucursal;
+import com.banquito.core.branches.service.SucursalService;
+import com.banquito.core.security.dto.api.UsuarioCoreRequest;
 import com.banquito.core.security.dto.api.UsuarioCoreResponse;
 import com.banquito.core.security.enums.EstadoUsuarioCoreEnum;
 import com.banquito.core.security.enums.RolUsuarioCoreEnum;
@@ -7,8 +12,11 @@ import com.banquito.core.security.mapper.SeguridadMapper;
 import com.banquito.core.security.model.UsuarioCore;
 import com.banquito.core.security.repository.UsuarioCoreRepository;
 import com.banquito.core.security.service.UsuarioCoreService;
+import com.banquito.core.shared.enums.CanalOrigenEnum;
+import com.banquito.core.shared.exception.BusinessException;
 import com.banquito.core.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +24,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UsuarioCoreServiceImpl implements UsuarioCoreService {
 
+    private static final String MODULO_SECURITY = "SECURITY";
+
     private final UsuarioCoreRepository repository;
+    private final PasswordEncoder passwordEncoder;
+    private final AuditoriaService auditoriaService;
+    private final SucursalService sucursalService;
 
     @Override
     @Transactional(readOnly = true)
@@ -45,5 +58,36 @@ public class UsuarioCoreServiceImpl implements UsuarioCoreService {
         boolean estadoValido = usuario.getEstado() == estadoRequerido;
 
         return rolValido && estadoValido;
+    }
+
+    @Override
+    @Transactional
+    public UsuarioCoreResponse crear(UsuarioCoreRequest request) {
+        repository.findByUsuario(request.usuario())
+                .ifPresent(u -> {
+                    throw new BusinessException("Ya existe un usuario con el nombre: " + request.usuario());
+                });
+
+        UsuarioCore usuario = SeguridadMapper.toEntity(request);
+        usuario.setPasswordHash(passwordEncoder.encode(request.contrasena()));
+
+        if (request.sucursalId() != null) {
+            Sucursal sucursal = sucursalService.obtenerEntidad(request.sucursalId());
+            usuario.setSucursal(sucursal);
+        }
+
+        UsuarioCore usuarioGuardado = repository.save(usuario);
+
+        auditoriaService.registrarEvento(
+                MODULO_SECURITY,
+                "CREAR_USUARIO_CORE",
+                "USUARIO_CORE",
+                usuarioGuardado.getId().toString(),
+                ResultadoAuditoriaEnum.EXITOSO,
+                CanalOrigenEnum.CORE,
+                "{\"usuario\":\"" + usuarioGuardado.getUsuario() + "\"}"
+        );
+
+        return SeguridadMapper.toResponse(usuarioGuardado);
     }
 }
