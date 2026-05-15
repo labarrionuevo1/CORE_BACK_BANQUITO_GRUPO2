@@ -8,5 +8,6 @@ public record TransferenciaResponse(
         UUID uuidDebitoCore,
         UUID uuidCreditoCore,
         UUID uuidGrupoOperacion,
-        BigDecimal saldoDisponibleOrigen
+        BigDecimal saldoDisponibleOrigen,
+        String numeroComprobante
 ) {}

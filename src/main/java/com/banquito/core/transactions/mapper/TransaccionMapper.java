@@ -36,7 +36,8 @@ public final class TransaccionMapper {
                 uuidDebitoCore,
                 uuidCreditoCore,
                 uuidGrupoOperacion,
-                saldoDisponibleOrigen
+            saldoDisponibleOrigen,
+            null
         );
     }
 }

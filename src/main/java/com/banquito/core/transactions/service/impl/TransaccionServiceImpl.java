@@ -1,6 +1,7 @@
 package com.banquito.core.transactions.service.impl;
 
 import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -48,6 +49,11 @@ public class TransaccionServiceImpl implements TransaccionService {
 
     private static final String MODULO_TRANSACCIONES = "TRANSACTIONS";
     private static final String ENTIDAD_TRANSACCION_CUENTA = "TRANSACCION_CUENTA";
+
+    private static final String COMPROBANTE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static final int COMPROBANTE_LENGTH = 10;
+    private static final int MAX_INTENTOS_COMPROBANTE = 5;
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final CuentaRepository cuentaRepository;
     private final SubtipoTransaccionRepository subtipoRepository;
@@ -119,6 +125,8 @@ public class TransaccionServiceImpl implements TransaccionService {
         UUID uuidDebito = request.uuidOperacion();
         UUID uuidCredito = UUID.randomUUID();
 
+        String numeroComprobante = resolverNumeroComprobante(request.numeroComprobante());
+
         origen.setSaldoContable(origen.getSaldoContable().subtract(request.monto()));
         origen.setSaldoDisponible(origen.getSaldoDisponible().subtract(request.monto()));
         origen.setFechaUltimoMovimiento(LocalDateTime.now());
@@ -142,7 +150,7 @@ public class TransaccionServiceImpl implements TransaccionService {
                 canalOrigen,
                 request.referenciaExterna(),
                 request.descripcion(),
-                request.numeroComprobante(),
+                numeroComprobante,
                 usuarioCore,
                 credencialWeb
         );
@@ -161,7 +169,7 @@ public class TransaccionServiceImpl implements TransaccionService {
                 canalOrigen,
                 request.referenciaExterna(),
                 request.descripcion(),
-                request.numeroComprobante(),
+                numeroComprobante,
                 usuarioCore,
                 credencialWeb
         );
@@ -178,7 +186,8 @@ public class TransaccionServiceImpl implements TransaccionService {
                 "{\"cuentaOrigen\":\"" + sanitizarJson(request.cuentaOrigen()) +
                         "\",\"cuentaDestino\":\"" + sanitizarJson(request.cuentaDestino()) +
                         "\",\"monto\":" + request.monto() +
-                        ",\"fechaNegocio\":\"" + fechaNegocio + "\"}"
+                        ",\"fechaNegocio\":\"" + fechaNegocio + "\"" +
+                        ",\"numeroComprobante\":\"" + numeroComprobante + "\"}"
         );
 
         return TransaccionMapper.toTransferenciaResponse(
@@ -214,6 +223,7 @@ public class TransaccionServiceImpl implements TransaccionService {
                 ));
 
         UUID uuid = UUID.randomUUID();
+        String numeroComprobante = generarNumeroComprobanteUnico();
 
         cuenta.setSaldoContable(cuenta.getSaldoContable().subtract(monto));
         cuenta.setSaldoDisponible(cuenta.getSaldoDisponible().subtract(monto));
@@ -233,7 +243,7 @@ public class TransaccionServiceImpl implements TransaccionService {
                 CanalOrigenEnum.SWITCH,
                 referenciaExterna,
                 "Debito de cuenta matriz por liquidacion de comision e IVA",
-                null,
+                numeroComprobante,
                 null,
                 null
         );
@@ -412,6 +422,51 @@ public class TransaccionServiceImpl implements TransaccionService {
                 ));
     }
 
+    private String resolverNumeroComprobante(String numeroComprobanteRequest) {
+        if (numeroComprobanteRequest == null || numeroComprobanteRequest.isBlank()) {
+            return generarNumeroComprobanteUnico();
+        }
+
+        String numeroComprobante = numeroComprobanteRequest.trim().toUpperCase();
+
+        if (numeroComprobante.length() > COMPROBANTE_LENGTH) {
+            throw new ValidationException("El número de comprobante no puede tener más de 10 caracteres");
+        }
+
+        if (!numeroComprobante.matches("^[A-Z0-9]+$")) {
+            throw new ValidationException("El número de comprobante solo puede contener letras mayúsculas y números");
+        }
+
+        if (transaccionCuentaRepository.existsByNumeroComprobante(numeroComprobante)) {
+            throw new ValidationException("El número de comprobante ya existe: " + numeroComprobante);
+        }
+
+        return numeroComprobante;
+    }
+
+    private String generarNumeroComprobanteUnico() {
+        for (int intento = 0; intento < MAX_INTENTOS_COMPROBANTE; intento++) {
+            String numeroComprobante = generarNumeroComprobante();
+
+            if (!transaccionCuentaRepository.existsByNumeroComprobante(numeroComprobante)) {
+                return numeroComprobante;
+            }
+        }
+
+        throw new ValidationException("No se pudo generar un número de comprobante único");
+    }
+
+    private String generarNumeroComprobante() {
+        StringBuilder codigo = new StringBuilder(COMPROBANTE_LENGTH);
+
+        for (int i = 0; i < COMPROBANTE_LENGTH; i++) {
+            int index = SECURE_RANDOM.nextInt(COMPROBANTE_CHARS.length());
+            codigo.append(COMPROBANTE_CHARS.charAt(index));
+        }
+
+        return codigo.toString();
+    }
+
     private TransaccionCuenta construirTransaccionCuenta(
             Cuenta cuenta,
             SubtipoTransaccion subtipo,
@@ -423,10 +478,10 @@ public class TransaccionServiceImpl implements TransaccionService {
             BigDecimal saldoResultante,
             CanalOrigenEnum canalOrigen,
             String referenciaExterna,
-                        String descripcion,
-                        String numeroComprobante,
-                        UsuarioCore usuarioCore,
-                        CredencialWeb credencialWeb
+            String descripcion,
+            String numeroComprobante,
+            UsuarioCore usuarioCore,
+            CredencialWeb credencialWeb
     ) {
         TransaccionCuenta transaccion = new TransaccionCuenta();
         transaccion.setCuenta(cuenta);
