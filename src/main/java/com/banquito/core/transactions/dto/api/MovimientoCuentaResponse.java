@@ -1,10 +1,10 @@
 package com.banquito.core.transactions.dto.api;
 
+import com.banquito.core.transactions.enums.TipoMovimientoEnum;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
-
-import com.banquito.core.transactions.enums.TipoMovimientoEnum;
 
 public record MovimientoCuentaResponse(
         Long id,
@@ -13,6 +13,7 @@ public record MovimientoCuentaResponse(
         BigDecimal monto,
         BigDecimal saldoResultante,
         String descripcion,
-        String numeroComprobante,
-        LocalDateTime fechaTransaccion
-) {}
+        LocalDateTime fechaTransaccion,
+        String numeroComprobante
+) {
+}

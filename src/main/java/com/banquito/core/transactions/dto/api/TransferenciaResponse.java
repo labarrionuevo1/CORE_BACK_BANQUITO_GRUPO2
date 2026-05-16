@@ -10,4 +10,5 @@ public record TransferenciaResponse(
         UUID uuidGrupoOperacion,
         BigDecimal saldoDisponibleOrigen,
         String numeroComprobante
-) {}
+) {
+}

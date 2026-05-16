@@ -13,9 +13,22 @@ public interface TransaccionService {
 
     TransferenciaResponse ejecutarTransferencia(TransferenciaRequest request);
 
-    UUID debitarCuentaMatrizLiquidacion(String numeroCuenta, BigDecimal monto, UUID uuidGrupoOperacion, String referenciaExterna);
+    UUID debitarCuentaMatrizLiquidacion(
+            String numeroCuenta,
+            BigDecimal monto,
+            UUID uuidGrupoOperacion,
+            String referenciaExterna,
+            boolean permitirSobregiroLiquidacion
+    );
 
-    UUID registrarMovimientoInstitucional(String codigoCuenta, String codigoSubtipo, TipoMovimientoEnum tipo, BigDecimal monto, UUID grupo, String referencia);
+    UUID registrarMovimientoInstitucional(
+            String codigoCuenta,
+            String codigoSubtipo,
+            TipoMovimientoEnum tipo,
+            BigDecimal monto,
+            UUID grupo,
+            String referencia
+    );
 
     List<MovimientoCuentaResponse> obtenerMovimientosPorCuenta(String numeroCuenta);
 

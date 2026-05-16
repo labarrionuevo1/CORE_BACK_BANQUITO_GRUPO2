@@ -16,8 +16,8 @@ import org.hibernate.type.SqlTypes;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.UUID;
 import java.util.Objects;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -51,10 +51,10 @@ public class TransaccionInstitucional {
     @Column(name = "TIPO_MOVIMIENTO", nullable = false, length = 15)
     private TipoMovimientoEnum tipoMovimiento;
 
-    @Column(name = "MONTO", nullable = false, precision = 19, scale = 4)
+    @Column(name = "MONTO", nullable = false, precision = 19, scale = 2)
     private BigDecimal monto;
 
-    @Column(name = "SALDO_RESULTANTE", nullable = false, precision = 19, scale = 4)
+    @Column(name = "SALDO_RESULTANTE", nullable = false, precision = 19, scale = 2)
     private BigDecimal saldoResultante;
 
     @Enumerated(EnumType.STRING)
@@ -108,5 +108,4 @@ public class TransaccionInstitucional {
     public String toString() {
         return "TransaccionInstitucional{" + "id=" + id + ", estado=" + estado + ", tipoMovimiento=" + tipoMovimiento + ", canalOrigen=" + canalOrigen + '}';
     }
-
 }
