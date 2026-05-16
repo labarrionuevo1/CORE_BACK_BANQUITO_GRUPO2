@@ -37,7 +37,7 @@ public class CuentaInstitucional {
     @Column(name = "TIPO_CUENTA", nullable = false, length = 20)
     private TipoCuentaInstitucionalEnum tipoCuenta;
 
-    @Column(name = "SALDO_CONTABLE", nullable = false, precision = 19, scale = 4)
+    @Column(name = "SALDO_CONTABLE", nullable = false, precision = 19, scale = 2)
     private BigDecimal saldoContable = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
@@ -81,5 +81,4 @@ public class CuentaInstitucional {
     public String toString() {
         return "CuentaInstitucional{" + "id=" + id + ", codigo=" + codigo + ", numeroCuenta=" + numeroCuenta + ", estado=" + estado + '}';
     }
-
 }
