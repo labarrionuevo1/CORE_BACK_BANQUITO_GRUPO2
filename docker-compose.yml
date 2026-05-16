@@ -14,7 +14,7 @@ services:
       - "3306:3306"
     volumes:
       - banquito_core_data:/var/lib/mysql
-      - ./src/main/resources/modeloFisicoBD_Core_v4_mariadb.sql:/docker-entrypoint-initdb.d/01_core.sql
+      - ./src/main/resources/modeloFisicoBD_Core_v5_mariadb.sql:/docker-entrypoint-initdb.d/01_core.sql
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 
 volumes:

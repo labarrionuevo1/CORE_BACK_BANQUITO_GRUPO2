@@ -1,5 +1,6 @@
 package com.banquito.core.security.repository;
 
+import com.banquito.core.security.enums.EstadoCredencialWebEnum;
 import com.banquito.core.security.model.CredencialWeb;
 import com.banquito.core.security.enums.EstadoCredencialWebEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
