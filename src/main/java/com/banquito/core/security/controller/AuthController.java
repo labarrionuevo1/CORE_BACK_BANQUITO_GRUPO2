@@ -1,5 +1,6 @@
 package com.banquito.core.security.controller;
 
+import com.banquito.core.security.dto.api.LoginPagosMasivosResponse;
 import com.banquito.core.security.dto.api.LoginRequest;
 import com.banquito.core.security.dto.api.LoginResponse;
 import com.banquito.core.security.service.AuthService;
@@ -21,5 +22,10 @@ public class AuthController {
     @PostMapping("/login")
     public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         return ApiResponse.ok("Login exitoso", service.login(request));
+    }
+
+    @PostMapping("/pagos-masivos/login")
+    public ApiResponse<LoginPagosMasivosResponse> loginPagosMasivos(@Valid @RequestBody LoginRequest request) {
+        return ApiResponse.ok("Login de pagos masivos exitoso", service.loginPagosMasivos(request));
     }
 }

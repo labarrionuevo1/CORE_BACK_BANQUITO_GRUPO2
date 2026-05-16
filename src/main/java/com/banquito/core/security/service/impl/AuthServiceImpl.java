@@ -2,10 +2,9 @@ package com.banquito.core.security.service.impl;
 
 import com.banquito.core.audit.enums.ResultadoAuditoriaEnum;
 import com.banquito.core.audit.service.AuditoriaService;
-import com.banquito.core.security.dto.api.CredencialWebResponse;
-import com.banquito.core.security.dto.api.LoginRequest;
-import com.banquito.core.security.dto.api.LoginResponse;
-import com.banquito.core.security.dto.api.UsuarioCoreResponse;
+import com.banquito.core.customers.enums.EstadoClienteEnum;
+import com.banquito.core.customers.enums.TipoClienteEnum;
+import com.banquito.core.security.dto.api.*;
 import com.banquito.core.security.enums.EstadoCredencialWebEnum;
 import com.banquito.core.security.enums.EstadoUsuarioCoreEnum;
 import com.banquito.core.security.mapper.SeguridadMapper;
@@ -30,7 +29,8 @@ public class AuthServiceImpl implements AuthService {
 
     private static final String MODULO_SEGURIDAD = "SEGURIDAD";
     private static final String ACCION_LOGIN = "LOGIN";
-    private static final String MENSAJE_CREDENCIALES_INVALIDAS = "Credenciales inválidas";
+    private static final String ACCION_LOGIN_PAGOS_MASIVOS = "LOGIN_PAGOS_MASIVOS";
+    private static final String MENSAJE_CREDENCIALES_INVALIDAS = "Usuario o contrasena incorrectos";
 
     private final CredencialWebRepository credencialWebRepository;
     private final UsuarioCoreRepository usuarioCoreRepository;
@@ -68,8 +68,63 @@ public class AuthServiceImpl implements AuthService {
             return loginCredencialWeb(credencialWebOptional.get(), request.contrasena());
         }
 
-        registrarLoginFallido(usuario, "USUARIO_NO_EXISTE");
+        registrarLoginFallido(usuario, "USUARIO_NO_EXISTE", ACCION_LOGIN);
         throw new ValidationException(MENSAJE_CREDENCIALES_INVALIDAS);
+    }
+
+    @Override
+    @Transactional
+    public LoginPagosMasivosResponse loginPagosMasivos(LoginRequest request) {
+        String usuario = request.usuario().trim();
+
+        CredencialWeb credencial = credencialWebRepository.findByUsuario(usuario)
+                .orElseThrow(() -> {
+                    registrarLoginFallido(usuario, "USUARIO_NO_EXISTE", ACCION_LOGIN_PAGOS_MASIVOS);
+                    return new ValidationException(MENSAJE_CREDENCIALES_INVALIDAS);
+                });
+
+        if (!passwordEncoder.matches(request.contrasena(), credencial.getPasswordHash())) {
+            registrarEventoCredencialWeb(credencial, ResultadoAuditoriaEnum.RECHAZADO, "PASSWORD_INVALIDO", ACCION_LOGIN_PAGOS_MASIVOS);
+            throw new ValidationException(MENSAJE_CREDENCIALES_INVALIDAS);
+        }
+
+        if (credencial.getEstado() != EstadoCredencialWebEnum.ACTIVO) {
+            registrarEventoCredencialWeb(credencial, ResultadoAuditoriaEnum.RECHAZADO, "CREDENCIAL_NO_ACTIVA", ACCION_LOGIN_PAGOS_MASIVOS);
+            throw new ValidationException("Credencial no se encuentra activa");
+        }
+
+        var cliente = credencial.getCliente();
+        if (cliente.getTipoCliente() != TipoClienteEnum.JURIDICO) {
+            registrarEventoCredencialWeb(credencial, ResultadoAuditoriaEnum.RECHAZADO, "CLIENTE_NO_JURIDICO", ACCION_LOGIN_PAGOS_MASIVOS);
+            throw new ValidationException("El cliente no es de tipo JURIDICO");
+        }
+
+        if (cliente.getEstado() != EstadoClienteEnum.ACTIVO) {
+            registrarEventoCredencialWeb(credencial, ResultadoAuditoriaEnum.RECHAZADO, "CLIENTE_NO_ACTIVO", ACCION_LOGIN_PAGOS_MASIVOS);
+            throw new ValidationException("El cliente no se encuentra activo");
+        }
+
+        if (!Boolean.TRUE.equals(cliente.getActivoPagosMasivos())) {
+            registrarEventoCredencialWeb(credencial, ResultadoAuditoriaEnum.RECHAZADO, "PAGOS_MASIVOS_NO_HABILITADO", ACCION_LOGIN_PAGOS_MASIVOS);
+            throw new ValidationException("El cliente no tiene habilitado el servicio de pagos masivos");
+        }
+
+        LocalDateTime ahora = LocalDateTime.now();
+        credencial.setUltimoLogin(ahora);
+        credencialWebRepository.save(credencial);
+
+        registrarEventoCredencialWeb(credencial, ResultadoAuditoriaEnum.EXITOSO, "LOGIN_EXITOSO", ACCION_LOGIN_PAGOS_MASIVOS);
+
+        return new LoginPagosMasivosResponse(
+                true,
+                "EMPRESA",
+                credencial.getId(),
+                cliente.getId(),
+                cliente.getIdentificacion(),
+                credencial.getUsuario(),
+                cliente.getRazonSocial(),
+                credencial.getEstado().name()
+        );
     }
 
     private LoginResponse loginUsuarioCore(UsuarioCore usuarioCore, String contrasena) {
@@ -104,12 +159,12 @@ public class AuthServiceImpl implements AuthService {
 
     private LoginResponse loginCredencialWeb(CredencialWeb credencialWeb, String contrasena) {
         if (credencialWeb.getEstado() != EstadoCredencialWebEnum.ACTIVO) {
-            registrarEventoCredencialWeb(credencialWeb, ResultadoAuditoriaEnum.RECHAZADO, "CREDENCIAL_NO_ACTIVA");
+            registrarEventoCredencialWeb(credencialWeb, ResultadoAuditoriaEnum.RECHAZADO, "CREDENCIAL_NO_ACTIVA", ACCION_LOGIN);
             throw new ValidationException(MENSAJE_CREDENCIALES_INVALIDAS);
         }
 
         if (!passwordEncoder.matches(contrasena, credencialWeb.getPasswordHash())) {
-            registrarEventoCredencialWeb(credencialWeb, ResultadoAuditoriaEnum.RECHAZADO, "PASSWORD_INVALIDO");
+            registrarEventoCredencialWeb(credencialWeb, ResultadoAuditoriaEnum.RECHAZADO, "PASSWORD_INVALIDO", ACCION_LOGIN);
             throw new ValidationException(MENSAJE_CREDENCIALES_INVALIDAS);
         }
 
@@ -117,7 +172,7 @@ public class AuthServiceImpl implements AuthService {
         credencialWeb.setUltimoLogin(ahora);
         credencialWebRepository.save(credencialWeb);
 
-        registrarEventoCredencialWeb(credencialWeb, ResultadoAuditoriaEnum.EXITOSO, "LOGIN_EXITOSO");
+        registrarEventoCredencialWeb(credencialWeb, ResultadoAuditoriaEnum.EXITOSO, "LOGIN_EXITOSO", ACCION_LOGIN);
 
         String nombre = credencialWeb.getCliente().getRazonSocial() != null
                 ? credencialWeb.getCliente().getRazonSocial()
@@ -155,11 +210,12 @@ public class AuthServiceImpl implements AuthService {
     private void registrarEventoCredencialWeb(
             CredencialWeb credencialWeb,
             ResultadoAuditoriaEnum resultado,
-            String motivo
+            String motivo,
+            String accion
     ) {
         auditoriaService.registrarEventoNuevaTransaccion(
                 MODULO_SEGURIDAD,
-                ACCION_LOGIN,
+                accion,
                 "CREDENCIAL_WEB",
                 credencialWeb.getId().toString(),
                 resultado,
@@ -168,10 +224,10 @@ public class AuthServiceImpl implements AuthService {
         );
     }
 
-    private void registrarLoginFallido(String usuario, String motivo) {
+    private void registrarLoginFallido(String usuario, String motivo, String accion) {
         auditoriaService.registrarEventoNuevaTransaccion(
                 MODULO_SEGURIDAD,
-                ACCION_LOGIN,
+                accion,
                 "AUTENTICACION",
                 usuario,
                 ResultadoAuditoriaEnum.RECHAZADO,

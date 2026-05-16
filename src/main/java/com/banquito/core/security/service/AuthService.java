@@ -1,9 +1,6 @@
 package com.banquito.core.security.service;
 
-import com.banquito.core.security.dto.api.CredencialWebResponse;
-import com.banquito.core.security.dto.api.LoginRequest;
-import com.banquito.core.security.dto.api.LoginResponse;
-import com.banquito.core.security.dto.api.UsuarioCoreResponse;
+import com.banquito.core.security.dto.api.*;
 
 public interface AuthService {
 
@@ -12,4 +9,6 @@ public interface AuthService {
     UsuarioCoreResponse buscarUsuarioCore(String usuario);
 
     LoginResponse login(LoginRequest request);
+
+    LoginPagosMasivosResponse loginPagosMasivos(LoginRequest request);
 }
