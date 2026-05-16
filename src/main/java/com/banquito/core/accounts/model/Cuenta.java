@@ -41,16 +41,16 @@ public class Cuenta {
     @Column(name = "ESTADO", nullable = false, length = 15)
     private EstadoCuentaEnum estado = EstadoCuentaEnum.ACTIVA;
 
-    @Column(name = "SALDO_CONTABLE", nullable = false, precision = 19, scale = 4)
+    @Column(name = "SALDO_CONTABLE", nullable = false, precision = 19, scale = 2)
     private BigDecimal saldoContable = BigDecimal.ZERO;
 
-    @Column(name = "SALDO_DISPONIBLE", nullable = false, precision = 19, scale = 4)
+    @Column(name = "SALDO_DISPONIBLE", nullable = false, precision = 19, scale = 2)
     private BigDecimal saldoDisponible = BigDecimal.ZERO;
 
     @Column(name = "PERMITE_SOBREGIRO", nullable = false)
     private Boolean permiteSobregiro = false;
 
-    @Column(name = "LIMITE_SOBREGIRO", nullable = false, precision = 19, scale = 4)
+    @Column(name = "LIMITE_SOBREGIRO", nullable = false, precision = 19, scale = 2)
     private BigDecimal limiteSobregiro = BigDecimal.ZERO;
 
     @Column(name = "ES_FAVORITA_PAGOS", nullable = false)
@@ -96,5 +96,4 @@ public class Cuenta {
     public String toString() {
         return "Cuenta{" + "id=" + id + ", numeroCuenta=" + numeroCuenta + ", estado=" + estado + '}';
     }
-
 }
