@@ -22,14 +22,42 @@ public class IntegracionSwitchController {
         return ApiResponse.ok("Validacion de empresa", service.validarEmpresa(ruc));
     }
 
+    @GetMapping("/empresas/{ruc}/cuentas/{numeroCuenta}/validacion-matriz")
+    public ApiResponse<?> validarCuentaMatriz(
+            @PathVariable String ruc,
+            @PathVariable String numeroCuenta
+    ) {
+        return ApiResponse.ok(
+                "Validacion de cuenta matriz completada",
+                service.validarCuentaMatriz(ruc, numeroCuenta)
+        );
+    }
+
+    @GetMapping("/empresas/{ruc}/credenciales/{username}/validacion")
+    public ApiResponse<?> validarCredencialEmpresarial(
+            @PathVariable String ruc,
+            @PathVariable String username
+    ) {
+        return ApiResponse.ok(
+                "Validacion de credencial empresarial completada",
+                service.validarCredencialEmpresarial(ruc, username)
+        );
+    }
+
     @GetMapping("/cuentas/{numeroCuenta}/disponibilidad")
     public ApiResponse<?> disponibilidad(@PathVariable String numeroCuenta) {
         return ApiResponse.ok("Disponibilidad de cuenta", service.consultarDisponibilidad(numeroCuenta));
     }
 
     @GetMapping("/cuentas/{numeroCuenta}/validacion-destino")
-    public ApiResponse<?> validarCuentaDestino(@PathVariable String numeroCuenta) {
-        return ApiResponse.ok("Validacion de cuenta destino", service.validarCuentaDestino(numeroCuenta));
+    public ApiResponse<?> validarCuentaDestino(
+            @PathVariable String numeroCuenta,
+            @RequestParam(required = false) String identificacionBeneficiario
+    ) {
+        return ApiResponse.ok(
+                "Validación de cuenta destino completada",
+                service.validarCuentaDestino(numeroCuenta, identificacionBeneficiario)
+        );
     }
 
     @PostMapping("/transacciones/transferencia")
@@ -39,11 +67,19 @@ public class IntegracionSwitchController {
 
     @PostMapping("/transacciones/liquidacion-servicio")
     public ApiResponse<?> liquidacion(@Valid @RequestBody LiquidacionServicioSwitchRequest request) {
-        return ApiResponse.ok("Liquidacion procesada", service.liquidarServicio(request));
+        return ApiResponse.ok("Liquidación procesada", service.liquidarServicio(request));
     }
 
     @GetMapping("/feriados/siguiente-dia-habil")
     public ApiResponse<?> siguienteDiaHabil(@RequestParam LocalDate fecha) {
-        return ApiResponse.ok("Siguiente dia habil", service.siguienteDiaHabil(fecha));
+        return ApiResponse.ok("Siguiente día hábil", service.siguienteDiaHabil(fecha));
+    }
+
+    @GetMapping("/calendario/dia-habil")
+    public ApiResponse<?> consultarDiaHabil(@RequestParam LocalDate fecha) {
+        return ApiResponse.ok(
+                "Consulta de dia habil completada",
+                service.consultarDiaHabil(fecha)
+        );
     }
 }
