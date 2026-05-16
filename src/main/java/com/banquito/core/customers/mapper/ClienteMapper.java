@@ -28,7 +28,7 @@ public final class ClienteMapper {
                 c.getEstado(),
                 c.getActivoPagosMasivos()
         );
-
+    }
 
     public static ClienteValidacionResponse toValidacionResponse(String ruc, boolean esValida, String mensaje, String motivo) {
         return new ClienteValidacionResponse(ruc, esValida, mensaje, motivo);
