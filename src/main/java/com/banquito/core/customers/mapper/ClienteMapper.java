@@ -5,23 +5,30 @@ import com.banquito.core.customers.dto.api.ClienteValidacionResponse;
 import com.banquito.core.customers.model.Cliente;
 
 public final class ClienteMapper {
-    private ClienteMapper() {
-    }
-
-    public static ClienteResponse toResponse(Cliente cliente) {
-        String nombre = cliente.getTipoCliente().name().equals("JURIDICO") ? cliente.getRazonSocial() : (cliente.getNombres() + " " + cliente.getApellidos()).trim();
+    private ClienteMapper() {}
+    public static ClienteResponse toResponse(Cliente c) {
+        Integer representanteId = c.getRepresentanteLegal() != null ? c.getRepresentanteLegal().getId() : null;
         return new ClienteResponse(
-                cliente.getId(),
-                cliente.getSubtipoClienteId(),
-                cliente.getTipoCliente(),
-                cliente.getTipoIdentificacion(),
-                cliente.getIdentificacion(),
-                nombre,
-                cliente.getEmail(),
-                cliente.getTelefonoMovil(),
-                cliente.getEstado(),
-                cliente.getActivoPagosMasivos());
-    }
+                c.getId(),
+                c.getSubtipoClienteId(),
+                c.getTipoCliente(),
+                c.getTipoIdentificacion(),
+                c.getIdentificacion(),
+                c.getNombres(),
+                c.getApellidos(),
+                c.getRazonSocial(),
+                c.getFechaNacimiento(),
+                c.getFechaConstitucion(),
+                representanteId,
+                c.getEmail(),
+                c.getTelefonoMovil(),
+                c.getDireccion(),
+                c.getLatitud(),
+                c.getLongitud(),
+                c.getEstado(),
+                c.getActivoPagosMasivos()
+        );
+
 
     public static ClienteValidacionResponse toValidacionResponse(String ruc, boolean esValida, String mensaje, String motivo) {
         return new ClienteValidacionResponse(ruc, esValida, mensaje, motivo);
