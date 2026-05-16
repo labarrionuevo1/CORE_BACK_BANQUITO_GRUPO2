@@ -20,7 +20,8 @@ public final class TransaccionMapper {
                 transaccion.getMonto(),
                 transaccion.getSaldoResultante(),
                 transaccion.getDescripcion(),
-                transaccion.getFechaTransaccion()
+                transaccion.getFechaTransaccion(),
+                transaccion.getNumeroComprobante()
         );
     }
 
@@ -28,14 +29,16 @@ public final class TransaccionMapper {
             UUID uuidDebitoCore,
             UUID uuidCreditoCore,
             UUID uuidGrupoOperacion,
-            BigDecimal saldoDisponibleOrigen
+            BigDecimal saldoDisponibleOrigen,
+            String numeroComprobante
     ) {
         return new TransferenciaResponse(
                 "EXITOSA",
                 uuidDebitoCore,
                 uuidCreditoCore,
                 uuidGrupoOperacion,
-                saldoDisponibleOrigen
+                saldoDisponibleOrigen,
+                numeroComprobante
         );
     }
 }
