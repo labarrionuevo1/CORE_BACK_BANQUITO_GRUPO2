@@ -13,6 +13,7 @@ import com.banquito.core.accounts.dto.api.CrearCuentaRequest;
 import com.banquito.core.accounts.dto.api.CuentaResponse;
 import com.banquito.core.accounts.dto.api.SaldoCuentaResponse;
 import com.banquito.core.accounts.enums.EstadoBloqueoCuentaEnum;
+import com.banquito.core.accounts.enums.EstadoCuentaEnum;
 import com.banquito.core.accounts.mapper.CuentaMapper;
 import com.banquito.core.accounts.model.BloqueoCuenta;
 import com.banquito.core.accounts.model.Cuenta;
@@ -26,6 +27,8 @@ import com.banquito.core.audit.enums.ResultadoAuditoriaEnum;
 import com.banquito.core.audit.service.AuditoriaService;
 import com.banquito.core.branches.repository.SucursalRepository;
 import com.banquito.core.customers.repository.ClienteRepository;
+import com.banquito.core.notifications.mapper.NotificacionMapper;
+import com.banquito.core.notifications.service.NotificacionService;
 import com.banquito.core.security.repository.UsuarioCoreRepository;
 import com.banquito.core.shared.enums.CanalOrigenEnum;
 import com.banquito.core.shared.exception.ResourceNotFoundException;
@@ -49,6 +52,7 @@ public class CuentaServiceImpl implements CuentaService {
     private final HistorialEstadoCuentaRepository historialRepository;
     private final UsuarioCoreRepository usuarioCoreRepository;
     private final AuditoriaService auditoriaService;
+    private final NotificacionService notificacionService;
 
     @Override
     public List<CuentaResponse> listar() {
@@ -153,6 +157,21 @@ public class CuentaServiceImpl implements CuentaService {
                 "{\"estadoAnterior\":\"" + anterior + "\",\"estadoNuevo\":\"" + request.nuevoEstado() + "\"}"
         );
 
+        if (esEstadoCritico(request.nuevoEstado())) {
+            notificacionService.enviarCorreo(
+                    NotificacionMapper.toCambioEstadoCriticoRequest(
+                            cuentaGuardada,
+                            anterior,
+                            request.nuevoEstado(),
+                            request.motivoCambio()
+                    ),
+                    "CAMBIAR_ESTADO_CUENTA",
+                    ENTIDAD_CUENTA,
+                    cuentaGuardada.getId().toString(),
+                    CanalOrigenEnum.CORE
+            );
+        }
+
         return CuentaMapper.toResponse(cuentaGuardada);
     }
 
@@ -193,6 +212,14 @@ public class CuentaServiceImpl implements CuentaService {
                 CanalOrigenEnum.CORE,
                 "{\"montoBloqueado\":" + request.montoBloqueado() + "}"
         );
+
+        notificacionService.enviarCorreo(
+                NotificacionMapper.toBloqueoCuentaRequest(cuenta, bloqueo),
+                "BLOQUEAR_CUENTA",
+                ENTIDAD_CUENTA,
+                cuenta.getId().toString(),
+                CanalOrigenEnum.CORE
+        );
     }
 
     @Override
@@ -222,5 +249,10 @@ public class CuentaServiceImpl implements CuentaService {
                 CanalOrigenEnum.CORE,
                 "{\"cuentaId\":\"" + cuenta.getId() + "\",\"montoLiberado\":" + bloqueo.getMontoBloqueado() + "}"
         );
+    }
+
+    private boolean esEstadoCritico(EstadoCuentaEnum estado) {
+        return estado == EstadoCuentaEnum.BLOQUEADA
+                || estado == EstadoCuentaEnum.SUSPENDIDA;
     }
 }
