@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface SubtipoTransaccionService {
     List<SubtipoTransaccionResponse> obtenerPorTipoMovimiento(TipoMovimientoEnum tipoMovimiento);
+    List<SubtipoTransaccionResponse> obtenerTodos();
 }
