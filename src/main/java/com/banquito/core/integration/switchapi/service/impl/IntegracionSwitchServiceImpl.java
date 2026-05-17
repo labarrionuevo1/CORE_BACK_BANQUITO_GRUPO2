@@ -29,6 +29,7 @@ import com.banquito.core.parameters.repository.FeriadoRepository;
 import com.banquito.core.parameters.service.FeriadoService;
 import com.banquito.core.security.enums.EstadoCredencialWebEnum;
 import com.banquito.core.security.repository.CredencialWebRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import com.banquito.core.shared.enums.CanalOrigenEnum;
 import com.banquito.core.shared.exception.ValidationException;
 import com.banquito.core.transactions.dto.api.TransferenciaRequest;
@@ -58,6 +59,7 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
     private final FeriadoRepository feriadoRepository;
     private final FeriadoService feriadoService;
     private final AuditoriaService auditoriaService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -350,23 +352,21 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
         var credencial = credencialOptional.get();
         System.out.println("Credencial encontrada. ID: " + credencial.getId() + ", Estado: " + credencial.getEstado());
 
-        // TEMPORAL: Desactivado validación de contraseña para desarrollo/pruebas
-        // En producción esto debe usar hashing (BCrypt, etc.)
-        // if (!credencial.getPasswordHash().equals(request.contraseña())) {
-        //     System.out.println("Contraseña incorrecta para usuario: " + request.usuario());
-        //     return new LoginResponse(
-        //         false,
-        //         null,
-        //         null,
-        //         null,
-        //         null,
-        //         null,
-        //         null,
-        //         null,
-        //         null,
-        //         false
-        //     );
-        // }
+        if (!passwordEncoder.matches(request.contraseña(), credencial.getPasswordHash())) {
+            System.out.println("Contraseña incorrecta para usuario: " + request.usuario());
+            return new LoginResponse(
+                    false,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false
+            );
+        }
 
         if (credencial.getEstado() != EstadoCredencialWebEnum.ACTIVO) {
             System.out.println("Credencial no está ACTIVA. Estado actual: " + credencial.getEstado());
