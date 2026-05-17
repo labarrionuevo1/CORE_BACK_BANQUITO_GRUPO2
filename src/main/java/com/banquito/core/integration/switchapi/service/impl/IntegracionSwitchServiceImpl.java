@@ -351,7 +351,8 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
                 CanalOrigenEnum.SWITCH,
                 request.fechaNegocio(),
                 request.usuarioCoreId(),
-                request.credencialWebId()
+                request.credencialWebId(),
+                null
         );
     }
 

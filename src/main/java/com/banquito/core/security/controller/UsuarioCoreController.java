@@ -5,37 +5,45 @@ import com.banquito.core.security.dto.api.UsuarioCoreRequest;
 import com.banquito.core.security.service.UsuarioCoreService;
 import com.banquito.core.shared.response.ApiResponse;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/core/usuarios-core")
-@RequiredArgsConstructor
 public class UsuarioCoreController {
 
     private final UsuarioCoreService service;
 
+    public UsuarioCoreController(UsuarioCoreService service) {
+        this.service = service;
+    }
+
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN_CORE')")
     public ApiResponse<?> listar() {
         return ApiResponse.ok("Usuarios core obtenidos", service.listar());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN_CORE', 'AUDITOR')")
     public ApiResponse<?> obtener(@PathVariable Integer id) {
         return ApiResponse.ok("Usuario core obtenido", service.obtener(id));
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN_CORE')")
     public ApiResponse<?> crear(@Valid @RequestBody UsuarioCoreRequest request) {
         return ApiResponse.ok("Usuario core creado", service.crear(request));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN_CORE')")
     public ApiResponse<?> actualizar(@PathVariable Integer id, @Valid @RequestBody UsuarioCoreRequest request) {
         return ApiResponse.ok("Usuario core actualizado", service.actualizar(id, request));
     }
 
     @PatchMapping("/{id}/estado")
+    @PreAuthorize("hasRole('ADMIN_CORE')")
     public ApiResponse<?> cambiarEstado(
             @PathVariable Integer id,
             @Valid @RequestBody UsuarioCoreEstadoRequest request
