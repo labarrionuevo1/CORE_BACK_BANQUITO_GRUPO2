@@ -71,7 +71,7 @@ public class TransaccionCuenta {
     @Column(name = "DESCRIPCION", length = 500)
     private String descripcion;
 
-    @Column(name = "NUMERO_COMPROBANTE", length = 20)
+    @Column(name = "NUMERO_COMPROBANTE", length = 25)
     private String numeroComprobante;
 
     @ManyToOne(fetch = FetchType.LAZY)
