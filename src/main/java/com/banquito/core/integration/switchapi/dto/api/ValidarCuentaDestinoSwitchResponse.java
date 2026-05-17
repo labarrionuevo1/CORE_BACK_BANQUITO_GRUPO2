@@ -5,6 +5,7 @@ import com.banquito.core.accounts.enums.EstadoCuentaEnum;
 public record ValidarCuentaDestinoSwitchResponse(
         String numeroCuenta,
         String identificacionBeneficiario,
+        String nombreBeneficiario,
         Boolean existe,
         Boolean perteneceBeneficiario,
         EstadoCuentaEnum estado,
