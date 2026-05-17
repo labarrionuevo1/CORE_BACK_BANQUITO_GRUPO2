@@ -54,6 +54,61 @@ public final class IntegracionSwitchMapper {
         );
     }
 
+    public static CuentaFavoritaPagosResponse toCuentaFavoritaResponse(
+            String rucEmpresa,
+            String numeroCuenta,
+            String estado,
+            Boolean permiteDebito,
+            java.math.BigDecimal saldoDisponible,
+            Boolean esFavoritaPagos,
+            Boolean valida
+    ) {
+        String codigo = valida ? "CUENTA_FAVORITA_VALIDA" : "CUENTA_FAVORITA_INVALIDA";
+        String mensaje = valida ? "Cuenta favorita valida para pagos masivos." : "Cuenta favorita no valida para pagos masivos.";
+        return new CuentaFavoritaPagosResponse(
+                rucEmpresa,
+                true,
+                numeroCuenta,
+                estado,
+                permiteDebito,
+                saldoDisponible,
+                esFavoritaPagos,
+                valida,
+                codigo,
+                mensaje
+        );
+    }
+
+    public static CuentaFavoritaPagosResponse toCuentaFavoritaNoExisteResponse(String rucEmpresa) {
+        return new CuentaFavoritaPagosResponse(
+                rucEmpresa,
+                false,
+                null,
+                null,
+                false,
+                null,
+                false,
+                false,
+                "CUENTA_FAVORITA_EMPRESA_NO_EXISTE",
+                "Empresa no existe o no tiene cuenta favorita para pagos masivos."
+        );
+    }
+
+    public static CuentaFavoritaPagosResponse toCuentaFavoritaNoEncontradaResponse(String rucEmpresa) {
+        return new CuentaFavoritaPagosResponse(
+                rucEmpresa,
+                true,
+                null,
+                null,
+                false,
+                null,
+                false,
+                false,
+                "CUENTA_FAVORITA_NO_ENCONTRADA",
+                "No se encontró cuenta favorita para pagos masivos."
+        );
+    }
+
     public static ValidarCuentaMatrizSwitchResponse toCuentaMatrizEmpresaNoExisteResponse(
             String ruc,
             String numeroCuenta,
