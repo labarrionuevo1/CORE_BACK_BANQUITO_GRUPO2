@@ -56,8 +56,7 @@ public class TransaccionServiceImpl implements TransaccionService {
 
     private static final String MODULO_TRANSACCIONES = "TRANSACTIONS";
     private static final String ENTIDAD_TRANSACCION_CUENTA = "TRANSACCION_CUENTA";
-    
-    // Prefijos dinámicos según tipo de transacción (formato estándar BQ)
+
     private static final String PREFIJO_BANQUITO = "BQ";
     private static final String TIPO_TRANSFERENCIA = "TR";
     private static final String TIPO_CREDITO = "CR";
@@ -84,17 +83,12 @@ public class TransaccionServiceImpl implements TransaccionService {
         
         try {
             TransferenciaResponse response = ejecutarTransferenciaInterna(request);
-            
-            // Flush explícito para asegurar que los cambios se persistan en la base de datos
             entityManager.flush();
-            
             log.info("Transferencia completada exitosamente: comprobante={}", response.numeroComprobante());
             return response;
         } catch (RuntimeException ex) {
-            log.error("Error en transferencia: origen={}, destino={}, error={}", 
+            log.error("Error en transferencia: origen={}, destino={}, error={}",
                     request.cuentaOrigen(), request.cuentaDestino(), ex.getMessage(), ex);
-            
-            // Asegurar rollback explícito
             if (TransactionAspectSupport.currentTransactionStatus() != null) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             }
@@ -368,17 +362,14 @@ public class TransaccionServiceImpl implements TransaccionService {
 
         String identificadorLimpio = identificador.trim();
 
-        // 1. Intentar parsear como UUID estándar completo
         try {
             UUID uuid = UUID.fromString(identificadorLimpio);
             TransaccionCuenta transaccion = transaccionCuentaRepository.findByUuidTransaccion(uuid)
                     .orElseThrow(() -> new ResourceNotFoundException("Transaccion no encontrada: " + identificador));
             return List.of(TransaccionMapper.toMovimientoResponse(transaccion));
         } catch (IllegalArgumentException ex) {
-            // No es un UUID válido, continuar con otros métodos
         }
 
-        // 2. Intentar buscar por número de comprobante completo
         List<TransaccionCuenta> porComprobante = transaccionCuentaRepository.findByNumeroComprobante(identificadorLimpio);
         if (!porComprobante.isEmpty()) {
             return porComprobante.stream()
@@ -386,18 +377,15 @@ public class TransaccionServiceImpl implements TransaccionService {
                     .toList();
         }
 
-        // 3. Sanitizar el identificador (remover prefijos de transacción)
         String identificadorSanitizado = sanitizarIdentificadorParaBusqueda(identificadorLimpio);
-        
-        // 4. Opción A: Buscar por sufijo de comprobante (ej: 'DC73C7B4' encuentra 'TRF-20260517-DC73C7B4')
+
         List<TransaccionCuenta> porSufijoComprobante = transaccionCuentaRepository.findByNumeroComprobanteSufijo(identificadorSanitizado);
         if (!porSufijoComprobante.isEmpty()) {
             return porSufijoComprobante.stream()
                     .map(TransaccionMapper::toMovimientoResponse)
                     .toList();
         }
-        
-        // 5. Opción B: Buscar por inicio de UUID (ej: 'dc73c7b4' busca UUIDs que inicien con 'dc73c7b4')
+
         List<TransaccionCuenta> porPrefijoUuid = transaccionCuentaRepository.findByUuidPrefijo(identificadorSanitizado);
         if (!porPrefijoUuid.isEmpty()) {
             return porPrefijoUuid.stream()
@@ -405,26 +393,15 @@ public class TransaccionServiceImpl implements TransaccionService {
                     .toList();
         }
 
-        // 6. Si no se encontró por ningún método
         throw new ResourceNotFoundException("Transaccion no encontrada: " + identificador);
     }
 
-    /**
-     * Sanitiza el identificador para búsqueda parcial.
-     * - Remueve prefijos visuales de tipo de transacción ('TRF-', 'CRE-', 'DEB-', 'BQ-')
-     * - Convierte a minúsculas (los UUIDs se almacenan en lowercase)
-     * - El resultado se usa para buscar por sufijo de comprobante o prefijo de UUID
-     */
     private String sanitizarIdentificadorParaBusqueda(String identificador) {
         String resultado = identificador;
-        
-        // Remover prefijos conocidos de tipo de transacción
-        if (resultado.startsWith("TRF-") || resultado.startsWith("CRE-") || 
+        if (resultado.startsWith("TRF-") || resultado.startsWith("CRE-") ||
             resultado.startsWith("DEB-") || resultado.startsWith("BQ-")) {
             resultado = resultado.substring(4);
         }
-        
-        // Convertir a minúsculas para coincidir con UUIDs almacenados
         return resultado.toLowerCase();
     }
 
@@ -433,18 +410,15 @@ public class TransaccionServiceImpl implements TransaccionService {
             Cuenta destino,
             TransferenciaRequest request
     ) {
-        // Cuenta origen debe estar ACTIVA (restringe salidas/débitos)
         if (origen.getEstado() != EstadoCuentaEnum.ACTIVA) {
             throw new AccountNotActiveException(
                     "Cuenta origen no esta activa: " + request.cuentaOrigen()
             );
         }
 
-        // Cuenta destino: permite BLOQUEADA e INACTIVA (solo restringe SUSPENDIDA)
-        // Las cuentas bloqueadas/inactivas pueden recibir fondos (créditos)
         if (destino.getEstado() == EstadoCuentaEnum.SUSPENDIDA) {
             throw new AccountNotActiveException(
-                    "Cuenta destino suspendida por irregularidades: " + request.cuentaDestino()
+                    "Cuenta destino esta suspendida: " + request.cuentaDestino()
             );
         }
     }
@@ -608,10 +582,7 @@ public class TransaccionServiceImpl implements TransaccionService {
     }
 
     private String generarNumeroComprobante(String tipoTransaccion, UUID uuidGrupoOperacion) {
-        // Extraer los últimos 8 caracteres del UUID como sufijo hexadecimal
         String sufijoHex = uuidGrupoOperacion.toString().replace("-", "").substring(24).toUpperCase();
-        
-        // Formato estándar del Core: BQ-[TIPO]-[SECUENCIAL_O_HEX]
         return PREFIJO_BANQUITO + "-" + tipoTransaccion + "-" + sufijoHex;
     }
 
@@ -619,20 +590,17 @@ public class TransaccionServiceImpl implements TransaccionService {
         if (codigoSubtipo == null) {
             return TIPO_DEFAULT;
         }
-        
+
         String codigoUpper = codigoSubtipo.toUpperCase();
-        
-        // Si el subtipo contiene DEPOSITO o CREDITO, usar tipo CR
+
         if (codigoUpper.contains("DEPOSITO") || codigoUpper.contains("CREDITO")) {
             return TIPO_CREDITO;
         }
-        
-        // Si contiene DEBITO, usar tipo DE
+
         if (codigoUpper.contains("DEBITO")) {
             return TIPO_DEBITO;
         }
-        
-        // Por defecto, usar tipo de transferencia
+
         return TIPO_TRANSFERENCIA;
     }
 
