@@ -45,7 +45,7 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional(readOnly = true)
     public Cliente obtenerEntidad(Integer id) {
-        return repository.findById(id)
+        return repository.findByIdWithRepresentanteLegal(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado: " + id));
     }
 
