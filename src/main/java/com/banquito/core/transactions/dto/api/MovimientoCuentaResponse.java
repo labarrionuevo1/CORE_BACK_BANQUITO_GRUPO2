@@ -13,5 +13,7 @@ public record MovimientoCuentaResponse(
         BigDecimal monto,
         BigDecimal saldoResultante,
         String descripcion,
-        LocalDateTime fechaTransaccion
-) {}
+        LocalDateTime fechaTransaccion,
+        String numeroComprobante
+) {
+}

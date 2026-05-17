@@ -8,13 +8,33 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public record LiquidacionServicioSwitchRequest(
-        @NotNull UUID uuidGrupoOperacion,
-        @NotBlank String cuentaMatriz,
-        @NotNull @DecimalMin("0.00") BigDecimal subtotalComision,
-        @NotNull @DecimalMin("0.00") BigDecimal montoIva,
-        @NotNull @DecimalMin("0.00") BigDecimal totalDebitado,
+
+        @NotNull(message = "El UUID de grupo de operacion es obligatorio")
+        UUID uuidGrupoOperacion,
+
+        @NotBlank(message = "La cuenta matriz es obligatoria")
+        String cuentaMatriz,
+
+        @NotNull(message = "El subtotal de comision es obligatorio")
+        @DecimalMin(value = "0.00", message = "El subtotal de comision no puede ser negativo")
+        BigDecimal subtotalComision,
+
+        @NotNull(message = "El monto IVA es obligatorio")
+        @DecimalMin(value = "0.00", message = "El monto IVA no puede ser negativo")
+        BigDecimal montoIva,
+
+        @NotNull(message = "El total debitado es obligatorio")
+        @DecimalMin(value = "0.00", message = "El total debitado no puede ser negativo")
+        BigDecimal totalDebitado,
+
         Boolean permiteSobregiro,
-        @NotBlank String codigoCuentaIngresos,
-        @NotBlank String codigoCuentaIva,
+
+        @NotBlank(message = "El codigo de cuenta de ingresos es obligatorio")
+        String codigoCuentaIngresos,
+
+        @NotBlank(message = "El codigo de cuenta IVA es obligatorio")
+        String codigoCuentaIva,
+
         String referenciaExterna
-) {}
+) {
+}

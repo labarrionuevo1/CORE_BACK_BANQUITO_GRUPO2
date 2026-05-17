@@ -5,8 +5,11 @@ import com.banquito.core.accounts.model.Cuenta;
 import com.banquito.core.accounts.repository.CuentaRepository;
 import com.banquito.core.audit.enums.ResultadoAuditoriaEnum;
 import com.banquito.core.audit.service.AuditoriaService;
+import com.banquito.core.customers.enums.EstadoClienteEnum;
 import com.banquito.core.institutional.enums.EstadoCuentaInstitucionalEnum;
 import com.banquito.core.institutional.repository.CuentaInstitucionalRepository;
+import com.banquito.core.security.enums.EstadoCredencialWebEnum;
+import com.banquito.core.security.enums.EstadoUsuarioCoreEnum;
 import com.banquito.core.security.model.CredencialWeb;
 import com.banquito.core.security.model.UsuarioCore;
 import com.banquito.core.security.repository.CredencialWebRepository;
@@ -37,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,6 +50,7 @@ public class TransaccionServiceImpl implements TransaccionService {
 
     private static final String MODULO_TRANSACCIONES = "TRANSACTIONS";
     private static final String ENTIDAD_TRANSACCION_CUENTA = "TRANSACCION_CUENTA";
+    private static final String PREFIJO_COMPROBANTE = "BQ";
 
     private final CuentaRepository cuentaRepository;
     private final SubtipoTransaccionRepository subtipoRepository;
@@ -95,6 +100,7 @@ public class TransaccionServiceImpl implements TransaccionService {
                         "Cuenta destino no encontrada: " + request.cuentaDestino()
                 ));
 
+        validarActorYPropiedad(request, origen);
         validarCuentasActivas(origen, destino, request);
         validarSaldoDisponible(origen, request.monto());
 
@@ -116,6 +122,7 @@ public class TransaccionServiceImpl implements TransaccionService {
 
         UUID uuidDebito = request.uuidOperacion();
         UUID uuidCredito = UUID.randomUUID();
+        String numeroComprobante = generarNumeroComprobante(fechaNegocio, uuidGrupoOperacion);
 
         origen.setSaldoContable(origen.getSaldoContable().subtract(request.monto()));
         origen.setSaldoDisponible(origen.getSaldoDisponible().subtract(request.monto()));
@@ -140,6 +147,7 @@ public class TransaccionServiceImpl implements TransaccionService {
                 canalOrigen,
                 request.referenciaExterna(),
                 request.descripcion(),
+                numeroComprobante,
                 usuarioCore,
                 credencialWeb
         );
@@ -158,6 +166,7 @@ public class TransaccionServiceImpl implements TransaccionService {
                 canalOrigen,
                 request.referenciaExterna(),
                 request.descripcion(),
+                numeroComprobante,
                 usuarioCore,
                 credencialWeb
         );
@@ -174,14 +183,16 @@ public class TransaccionServiceImpl implements TransaccionService {
                 "{\"cuentaOrigen\":\"" + sanitizarJson(request.cuentaOrigen()) +
                         "\",\"cuentaDestino\":\"" + sanitizarJson(request.cuentaDestino()) +
                         "\",\"monto\":" + request.monto() +
-                        ",\"fechaNegocio\":\"" + fechaNegocio + "\"}"
+                        ",\"fechaNegocio\":\"" + fechaNegocio +
+                        "\",\"numeroComprobante\":\"" + numeroComprobante + "\"}"
         );
 
         return TransaccionMapper.toTransferenciaResponse(
                 uuidDebito,
                 uuidCredito,
                 uuidGrupoOperacion,
-                origen.getSaldoDisponible()
+                origen.getSaldoDisponible(),
+                numeroComprobante
         );
     }
 
@@ -191,7 +202,8 @@ public class TransaccionServiceImpl implements TransaccionService {
             String numeroCuenta,
             BigDecimal monto,
             UUID uuidGrupoOperacion,
-            String referenciaExterna
+            String referenciaExterna,
+            boolean permitirSobregiroLiquidacion
     ) {
         Cuenta cuenta = cuentaRepository.findByNumeroCuenta(numeroCuenta)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -202,7 +214,9 @@ public class TransaccionServiceImpl implements TransaccionService {
             throw new AccountNotActiveException("Cuenta matriz no esta activa: " + numeroCuenta);
         }
 
-        validarSaldoDisponible(cuenta, monto);
+        if (!permitirSobregiroLiquidacion) {
+            validarSaldoDisponible(cuenta, monto);
+        }
 
         SubtipoTransaccion subtipo = subtipoRepository.findByCodigo("COBRO_COMISION")
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -210,6 +224,8 @@ public class TransaccionServiceImpl implements TransaccionService {
                 ));
 
         UUID uuid = UUID.randomUUID();
+        LocalDate fechaNegocio = LocalDate.now();
+        String numeroComprobante = generarNumeroComprobante(fechaNegocio, uuidGrupoOperacion);
 
         cuenta.setSaldoContable(cuenta.getSaldoContable().subtract(monto));
         cuenta.setSaldoDisponible(cuenta.getSaldoDisponible().subtract(monto));
@@ -222,13 +238,14 @@ public class TransaccionServiceImpl implements TransaccionService {
                 subtipo,
                 uuid,
                 uuidGrupoOperacion,
-                LocalDate.now(),
+                fechaNegocio,
                 TipoMovimientoEnum.DEBITO,
                 monto,
                 cuenta.getSaldoContable(),
                 CanalOrigenEnum.SWITCH,
                 referenciaExterna,
                 "Debito de cuenta matriz por liquidacion de comision e IVA",
+                numeroComprobante,
                 null,
                 null
         );
@@ -328,7 +345,7 @@ public class TransaccionServiceImpl implements TransaccionService {
     }
 
     private void validarSaldoDisponible(Cuenta cuenta, BigDecimal monto) {
-        BigDecimal limiteSobregiro = cuenta.getLimiteSobregiro() != null
+        BigDecimal limiteSobregiro = Boolean.TRUE.equals(cuenta.getPermiteSobregiro()) && cuenta.getLimiteSobregiro() != null
                 ? cuenta.getLimiteSobregiro()
                 : BigDecimal.ZERO;
 
@@ -359,9 +376,51 @@ public class TransaccionServiceImpl implements TransaccionService {
         }
     }
 
+    private void validarActorYPropiedad(TransferenciaRequest request, Cuenta cuentaOrigen) {
+        CanalOrigenEnum canal = resolverCanalOrigen(request);
+
+        if (canal == CanalOrigenEnum.WEB) {
+            if (request.credencialWebId() == null) {
+                throw new ValidationException("Las operaciones WEB requieren credencial web");
+            }
+
+            var credencial = credencialWebRepository.findById(request.credencialWebId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Credencial web no encontrada: " + request.credencialWebId()
+                    ));
+
+            if (credencial.getEstado() != EstadoCredencialWebEnum.ACTIVO) {
+                throw new ValidationException("La credencial web no esta activa");
+            }
+
+            if (credencial.getCliente() == null) {
+                throw new ValidationException("La credencial web no tiene cliente asociado");
+            }
+
+            if (credencial.getCliente().getEstado() != EstadoClienteEnum.ACTIVO) {
+                throw new ValidationException("El cliente asociado a la credencial no esta activo");
+            }
+
+            if (!cuentaOrigen.getCliente().getId().equals(credencial.getCliente().getId())) {
+                throw new ValidationException("La cuenta origen no pertenece al cliente autenticado");
+            }
+        }
+
+        if (canal == CanalOrigenEnum.CORE && request.usuarioCoreId() != null) {
+            var usuario = usuarioCoreRepository.findById(request.usuarioCoreId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Usuario core no encontrado: " + request.usuarioCoreId()
+                    ));
+
+            if (usuario.getEstado() != EstadoUsuarioCoreEnum.ACTIVO) {
+                throw new ValidationException("El usuario core no esta activo");
+            }
+        }
+    }
+
     private void validarActorTransaccional(TransferenciaRequest request) {
         if (request.usuarioCoreId() != null && request.credencialWebId() != null) {
-            throw new ValidationException("La transacción no puede tener usuarioCoreId y credencialWebId al mismo tiempo");
+            throw new ValidationException("La transaccion no puede tener usuarioCoreId y credencialWebId al mismo tiempo");
         }
     }
 
@@ -419,6 +478,7 @@ public class TransaccionServiceImpl implements TransaccionService {
             CanalOrigenEnum canalOrigen,
             String referenciaExterna,
             String descripcion,
+            String numeroComprobante,
             UsuarioCore usuarioCore,
             CredencialWeb credencialWeb
     ) {
@@ -435,10 +495,17 @@ public class TransaccionServiceImpl implements TransaccionService {
         transaccion.setCanalOrigen(canalOrigen);
         transaccion.setReferenciaExterna(referenciaExterna);
         transaccion.setDescripcion(descripcion);
+        transaccion.setNumeroComprobante(numeroComprobante);
         transaccion.setUsuarioCore(usuarioCore);
         transaccion.setCredencialWeb(credencialWeb);
 
         return transaccion;
+    }
+
+    private String generarNumeroComprobante(LocalDate fechaNegocio, UUID uuidGrupoOperacion) {
+        String fecha = fechaNegocio.format(DateTimeFormatter.BASIC_ISO_DATE);
+        String sufijo = uuidGrupoOperacion.toString().replace("-", "").substring(0, 8).toUpperCase();
+        return PREFIJO_COMPROBANTE + "-" + fecha + "-" + sufijo;
     }
 
     private String sanitizarJson(String valor) {

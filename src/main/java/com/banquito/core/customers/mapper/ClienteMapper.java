@@ -7,9 +7,27 @@ import com.banquito.core.customers.model.Cliente;
 public final class ClienteMapper {
     private ClienteMapper() {}
     public static ClienteResponse toResponse(Cliente c) {
-        String nombre = c.getTipoCliente().name().equals("JURIDICO") ? c.getRazonSocial() : (c.getNombres() + " " + c.getApellidos()).trim();
-        return new ClienteResponse(c.getId(), c.getSubtipoClienteId(), c.getTipoCliente(), c.getTipoIdentificacion(), c.getIdentificacion(), nombre,
-                c.getEmail(), c.getTelefonoMovil(), c.getEstado(), c.getActivoPagosMasivos());
+        Integer representanteId = c.getRepresentanteLegal() != null ? c.getRepresentanteLegal().getId() : null;
+        return new ClienteResponse(
+                c.getId(),
+                c.getSubtipoClienteId(),
+                c.getTipoCliente(),
+                c.getTipoIdentificacion(),
+                c.getIdentificacion(),
+                c.getNombres(),
+                c.getApellidos(),
+                c.getRazonSocial(),
+                c.getFechaNacimiento(),
+                c.getFechaConstitucion(),
+                representanteId,
+                c.getEmail(),
+                c.getTelefonoMovil(),
+                c.getDireccion(),
+                c.getLatitud(),
+                c.getLongitud(),
+                c.getEstado(),
+                c.getActivoPagosMasivos()
+        );
     }
 
     public static ClienteValidacionResponse toValidacionResponse(String ruc, boolean esValida, String mensaje, String motivo) {
