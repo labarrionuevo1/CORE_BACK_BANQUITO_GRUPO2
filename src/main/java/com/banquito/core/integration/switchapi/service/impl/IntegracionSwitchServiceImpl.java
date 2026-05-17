@@ -15,6 +15,8 @@ import com.banquito.core.customers.model.Cliente;
 import com.banquito.core.customers.repository.ClienteRepository;
 import com.banquito.core.integration.switchapi.dto.api.CuentaFavoritaPagosResponse;
 import com.banquito.core.integration.switchapi.dto.api.DiaHabilSwitchResponse;
+import com.banquito.core.integration.switchapi.dto.api.LoginRequest;
+import com.banquito.core.integration.switchapi.dto.api.LoginResponse;
 import com.banquito.core.integration.switchapi.dto.api.LiquidacionServicioSwitchRequest;
 import com.banquito.core.integration.switchapi.dto.api.LiquidacionServicioSwitchResponse;
 import com.banquito.core.integration.switchapi.dto.api.ValidarCredencialEmpresaSwitchResponse;
@@ -319,6 +321,123 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
                 cuentaFavorita.getEsFavoritaPagos(),
                 valida,
                 nombreBeneficiario
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public LoginResponse login(LoginRequest request) {
+        System.out.println("Intentando login para usuario: " + request.usuario());
+
+        var credencialOptional = credencialWebRepository.findByUsuario(request.usuario());
+
+        if (credencialOptional.isEmpty()) {
+            System.out.println("Credencial no encontrada para usuario: " + request.usuario());
+            return new LoginResponse(
+                    false,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false
+            );
+        }
+
+        var credencial = credencialOptional.get();
+        System.out.println("Credencial encontrada. ID: " + credencial.getId() + ", Estado: " + credencial.getEstado());
+
+        // TEMPORAL: Desactivado validación de contraseña para desarrollo/pruebas
+        // En producción esto debe usar hashing (BCrypt, etc.)
+        // if (!credencial.getPasswordHash().equals(request.contraseña())) {
+        //     System.out.println("Contraseña incorrecta para usuario: " + request.usuario());
+        //     return new LoginResponse(
+        //         false,
+        //         null,
+        //         null,
+        //         null,
+        //         null,
+        //         null,
+        //         null,
+        //         null,
+        //         null,
+        //         false
+        //     );
+        // }
+
+        if (credencial.getEstado() != EstadoCredencialWebEnum.ACTIVO) {
+            System.out.println("Credencial no está ACTIVA. Estado actual: " + credencial.getEstado());
+            return new LoginResponse(
+                    false,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false
+            );
+        }
+
+        Cliente cliente = credencial.getCliente();
+        if (cliente == null) {
+            System.out.println("Cliente es null para credencial ID: " + credencial.getId());
+            return new LoginResponse(
+                    false,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false
+            );
+        }
+
+        if (cliente.getEstado() != EstadoClienteEnum.ACTIVO) {
+            System.out.println("Cliente no está ACTIVO. Estado actual: " + cliente.getEstado());
+            return new LoginResponse(
+                    false,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false
+            );
+        }
+
+        boolean activoPagosMasivos = Boolean.TRUE.equals(cliente.getActivoPagosMasivos());
+
+        String nombre;
+        if (cliente.getTipoCliente() == TipoClienteEnum.JURIDICO) {
+            nombre = cliente.getRazonSocial();
+        } else {
+            nombre = cliente.getNombres() + " " + cliente.getApellidos();
+        }
+
+        System.out.println("Login exitoso para usuario: " + request.usuario());
+        return new LoginResponse(
+                true,
+                cliente.getTipoCliente() == TipoClienteEnum.JURIDICO ? "EMPRESA" : "PERSONA",
+                "CRED-" + credencial.getId(),
+                "CLI-" + cliente.getId(),
+                cliente.getIdentificacion(),
+                credencial.getUsuario(),
+                nombre,
+                "EMPRESA",
+                cliente.getEstado().name(),
+                activoPagosMasivos
         );
     }
 
