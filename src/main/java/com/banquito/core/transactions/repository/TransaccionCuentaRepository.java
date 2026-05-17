@@ -26,4 +26,12 @@ public interface TransaccionCuentaRepository extends JpaRepository<TransaccionCu
     );
 
     Optional<TransaccionCuenta> findByUuidTransaccion(UUID uuidTransaccion);
+
+    List<TransaccionCuenta> findByNumeroComprobante(String numeroComprobante);
+
+    @Query("SELECT t FROM TransaccionCuenta t WHERE LOWER(t.numeroComprobante) LIKE LOWER(CONCAT('%', :sufijo))")
+    List<TransaccionCuenta> findByNumeroComprobanteSufijo(@Param("sufijo") String sufijo);
+
+    @Query("SELECT t FROM TransaccionCuenta t WHERE LOWER(t.uuidTransaccion) LIKE LOWER(CONCAT('%', :prefijo, '%'))")
+    List<TransaccionCuenta> findByUuidPrefijo(@Param("prefijo") String prefijo);
 }

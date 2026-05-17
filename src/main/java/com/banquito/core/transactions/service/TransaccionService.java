@@ -33,4 +33,6 @@ public interface TransaccionService {
     List<MovimientoCuentaResponse> obtenerMovimientosPorCuenta(String numeroCuenta);
 
     MovimientoCuentaResponse obtenerPorUuid(UUID uuid);
+
+    List<MovimientoCuentaResponse> obtenerPorIdentificador(String identificador);
 }

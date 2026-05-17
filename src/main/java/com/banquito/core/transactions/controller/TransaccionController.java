@@ -36,8 +36,8 @@ public class TransaccionController {
         return ApiResponse.ok("Movimientos obtenidos", service.obtenerMovimientosPorCuenta(numeroCuenta));
     }
 
-    @GetMapping("/{uuid}")
-    public ApiResponse<MovimientoCuentaResponse> obtenerPorUuid(@PathVariable UUID uuid) {
-        return ApiResponse.ok("Transacción obtenida", service.obtenerPorUuid(uuid));
+    @GetMapping("/{identificador}")
+    public ApiResponse<List<MovimientoCuentaResponse>> obtenerPorIdentificador(@PathVariable String identificador) {
+        return ApiResponse.ok("Transacciones obtenidas", service.obtenerPorIdentificador(identificador));
     }
 }

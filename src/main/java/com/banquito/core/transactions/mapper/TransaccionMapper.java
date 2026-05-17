@@ -21,7 +21,8 @@ public final class TransaccionMapper {
                 transaccion.getSaldoResultante(),
                 transaccion.getDescripcion(),
                 transaccion.getFechaTransaccion(),
-                transaccion.getNumeroComprobante()
+                transaccion.getNumeroComprobante(),
+                transaccion.getCuenta() != null ? transaccion.getCuenta().getNumeroCuenta() : null
         );
     }
 
