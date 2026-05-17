@@ -45,9 +45,6 @@ public record TransferenciaRequest(
 
         Integer usuarioCoreId,
 
-        Integer credencialWebId,
-
-        @Size(max = 64, message = "El token de aprobacion no puede superar 64 caracteres")
-        String tokenAprobacion
+        Integer credencialWebId
 ) {
 }

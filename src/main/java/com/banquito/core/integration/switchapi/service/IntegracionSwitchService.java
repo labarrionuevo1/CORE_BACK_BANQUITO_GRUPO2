@@ -11,8 +11,6 @@ import com.banquito.core.integration.switchapi.dto.api.ValidarEmpresaSwitchRespo
 import com.banquito.core.integration.switchapi.dto.api.ValidarCredencialEmpresaSwitchResponse;
 import com.banquito.core.integration.switchapi.dto.api.ValidarCuentaDestinoSwitchResponse;
 import com.banquito.core.integration.switchapi.dto.api.ValidarCuentaMatrizSwitchResponse;
-import com.banquito.core.integration.switchapi.dto.api.LoginRequest;
-import com.banquito.core.integration.switchapi.dto.api.LoginResponse;
 import com.banquito.core.transactions.dto.api.TransferenciaRequest;
 import com.banquito.core.transactions.dto.api.TransferenciaResponse;
 
@@ -37,6 +35,4 @@ public interface IntegracionSwitchService {
     DiaHabilSwitchResponse consultarDiaHabil(LocalDate fecha);
 
     LocalDate siguienteDiaHabil(LocalDate fecha);
-
-    LoginResponse login(LoginRequest request);
 }
