@@ -5,11 +5,13 @@ import com.banquito.core.audit.service.AuditoriaService;
 import com.banquito.core.notifications.dto.internal.EnviarCorreoRequest;
 import com.banquito.core.notifications.service.NotificacionService;
 import com.banquito.core.shared.enums.CanalOrigenEnum;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,12 +55,31 @@ public class NotificacionServiceImpl implements NotificacionService {
             return;
         }
 
+        if (request == null
+                || esTextoVacio(request.destinatario())
+                || esTextoVacio(request.asunto())
+                || esTextoVacio(request.contenido())) {
+            registrarAuditoria(
+                    "CORREO_OMITIDO",
+                    request,
+                    accionOrigen,
+                    entidadOrigen,
+                    entidadIdOrigen,
+                    canalOrigen,
+                    ResultadoAuditoriaEnum.RECHAZADO,
+                    "Datos requeridos de correo incompletos"
+            );
+            return;
+        }
+
         try {
-            SimpleMailMessage mensaje = new SimpleMailMessage();
-            mensaje.setFrom(remitente);
-            mensaje.setTo(request.destinatario());
-            mensaje.setSubject(request.asunto());
-            mensaje.setText(request.contenido());
+            MimeMessage mensaje = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mensaje, false, "UTF-8");
+
+            helper.setFrom(remitente);
+            helper.setTo(request.destinatario());
+            helper.setSubject(request.asunto());
+            helper.setText(request.contenido(), true);
 
             mailSender.send(mensaje);
 
@@ -72,7 +93,7 @@ public class NotificacionServiceImpl implements NotificacionService {
                     ResultadoAuditoriaEnum.EXITOSO,
                     null
             );
-        } catch (MailException ex) {
+        } catch (MailException | MessagingException ex) {
             registrarAuditoria(
                     "CORREO_FALLIDO",
                     request,
@@ -118,12 +139,19 @@ public class NotificacionServiceImpl implements NotificacionService {
             String entidadIdOrigen,
             String error
     ) {
-        return "{\"destinatario\":\"" + sanitizarJson(request.destinatario()) +
-                "\",\"asunto\":\"" + sanitizarJson(request.asunto()) +
+        String destinatario = request != null ? request.destinatario() : null;
+        String asunto = request != null ? request.asunto() : null;
+
+        return "{\"destinatario\":\"" + sanitizarJson(destinatario) +
+                "\",\"asunto\":\"" + sanitizarJson(asunto) +
                 "\",\"accionOrigen\":\"" + sanitizarJson(accionOrigen) +
                 "\",\"entidadOrigen\":\"" + sanitizarJson(entidadOrigen) +
                 "\",\"entidadIdOrigen\":\"" + sanitizarJson(entidadIdOrigen) +
                 "\",\"error\":\"" + sanitizarJson(error) + "\"}";
+    }
+
+    private boolean esTextoVacio(String valor) {
+        return valor == null || valor.isBlank();
     }
 
     private String sanitizarJson(String valor) {
@@ -132,6 +160,8 @@ public class NotificacionServiceImpl implements NotificacionService {
         }
 
         return valor.replace("\\", "\\\\")
-                .replace("\"", "\\\"");
+                .replace("\"", "\\\"")
+                .replace("\n", " ")
+                .replace("\r", " ");
     }
 }
