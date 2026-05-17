@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.banquito.core.integration.switchapi.dto.api.LiquidacionServicioSwitchRequest;
+import com.banquito.core.integration.switchapi.dto.api.LoginRequest;
+import com.banquito.core.integration.switchapi.dto.api.LoginResponse;
 import com.banquito.core.integration.switchapi.service.IntegracionSwitchService;
 import com.banquito.core.shared.response.ApiResponse;
 import com.banquito.core.transactions.dto.api.TransferenciaRequest;
@@ -50,6 +52,16 @@ public class IntegracionSwitchController {
                 "Validacion de credencial empresarial completada",
                 service.validarCredencialEmpresarial(ruc, username)
         );
+    }
+
+    @GetMapping("/empresas/{ruc}/cuenta-favorita-pagos")
+    public Object consultarCuentaFavoritaPagos(@PathVariable String ruc) {
+        return service.consultarCuentaFavoritaPagos(ruc);
+    }
+
+    @PostMapping("/autenticacion/login")
+    public Object login(@Valid @RequestBody LoginRequest request) {
+        return service.login(request);
     }
 
     @GetMapping("/cuentas/{numeroCuenta}/disponibilidad")

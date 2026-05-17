@@ -13,12 +13,10 @@ import com.banquito.core.customers.enums.TipoClienteEnum;
 import com.banquito.core.customers.enums.TipoIdentificacionEnum;
 import com.banquito.core.customers.model.Cliente;
 import com.banquito.core.customers.repository.ClienteRepository;
-<<<<<<< Updated upstream
-import com.banquito.core.integration.switchapi.dto.api.DiaHabilSwitchResponse;
-=======
-import com.banquito.core.accounts.repository.CuentaRepository;
 import com.banquito.core.integration.switchapi.dto.api.CuentaFavoritaPagosResponse;
->>>>>>> Stashed changes
+import com.banquito.core.integration.switchapi.dto.api.DiaHabilSwitchResponse;
+import com.banquito.core.integration.switchapi.dto.api.LoginRequest;
+import com.banquito.core.integration.switchapi.dto.api.LoginResponse;
 import com.banquito.core.integration.switchapi.dto.api.LiquidacionServicioSwitchRequest;
 import com.banquito.core.integration.switchapi.dto.api.LiquidacionServicioSwitchResponse;
 import com.banquito.core.integration.switchapi.dto.api.ValidarCredencialEmpresaSwitchResponse;
@@ -55,11 +53,7 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
     private final ClienteRepository clienteRepository;
     private final CuentaRepository cuentaRepository;
     private final CuentaService cuentaService;
-<<<<<<< Updated upstream
     private final CredencialWebRepository credencialWebRepository;
-=======
-    private final CuentaRepository cuentaRepository;
->>>>>>> Stashed changes
     private final TransaccionService transaccionService;
     private final FeriadoRepository feriadoRepository;
     private final FeriadoService feriadoService;
@@ -249,6 +243,15 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
         );
     }
 
+
+    @Override
+    @Transactional(readOnly = true)
+    public SaldoCuentaResponse consultarDisponibilidad(String numeroCuenta) {
+        return CuentaMapper.toSaldoResponse(
+                cuentaService.obtenerPorNumero(numeroCuenta)
+        );
+    }
+
     @Override
     @Transactional(readOnly = true)
     public CuentaFavoritaPagosResponse consultarCuentaFavoritaPagos(String ruc) {
@@ -291,6 +294,7 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
         var cuentaFavorita = cuentaFavoritaOptional.get();
         boolean valida = cuentaFavorita.getEstado() == EstadoCuentaEnum.ACTIVA;
         boolean permiteDebito = valida && cuentaFavorita.getSaldoDisponible().compareTo(java.math.BigDecimal.ZERO) >= 0;
+        String nombreBeneficiario = IntegracionSwitchMapper.resolverNombreBeneficiario(cuentaFavorita);
 
         auditoriaService.registrarEvento(
                 MODULO_INTEGRACION_SWITCH,
@@ -315,15 +319,125 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
                 permiteDebito,
                 cuentaFavorita.getSaldoDisponible(),
                 cuentaFavorita.getEsFavoritaPagos(),
-                valida
+                valida,
+                nombreBeneficiario
         );
     }
 
     @Override
     @Transactional(readOnly = true)
-    public SaldoCuentaResponse consultarDisponibilidad(String numeroCuenta) {
-        return CuentaMapper.toSaldoResponse(
-                cuentaService.obtenerPorNumero(numeroCuenta)
+    public LoginResponse login(LoginRequest request) {
+        System.out.println("Intentando login para usuario: " + request.usuario());
+
+        var credencialOptional = credencialWebRepository.findByUsuario(request.usuario());
+
+        if (credencialOptional.isEmpty()) {
+            System.out.println("Credencial no encontrada para usuario: " + request.usuario());
+            return new LoginResponse(
+                    false,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false
+            );
+        }
+
+        var credencial = credencialOptional.get();
+        System.out.println("Credencial encontrada. ID: " + credencial.getId() + ", Estado: " + credencial.getEstado());
+
+        // TEMPORAL: Desactivado validación de contraseña para desarrollo/pruebas
+        // En producción esto debe usar hashing (BCrypt, etc.)
+        // if (!credencial.getPasswordHash().equals(request.contraseña())) {
+        //     System.out.println("Contraseña incorrecta para usuario: " + request.usuario());
+        //     return new LoginResponse(
+        //         false,
+        //         null,
+        //         null,
+        //         null,
+        //         null,
+        //         null,
+        //         null,
+        //         null,
+        //         null,
+        //         false
+        //     );
+        // }
+
+        if (credencial.getEstado() != EstadoCredencialWebEnum.ACTIVO) {
+            System.out.println("Credencial no está ACTIVA. Estado actual: " + credencial.getEstado());
+            return new LoginResponse(
+                    false,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false
+            );
+        }
+
+        Cliente cliente = credencial.getCliente();
+        if (cliente == null) {
+            System.out.println("Cliente es null para credencial ID: " + credencial.getId());
+            return new LoginResponse(
+                    false,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false
+            );
+        }
+
+        if (cliente.getEstado() != EstadoClienteEnum.ACTIVO) {
+            System.out.println("Cliente no está ACTIVO. Estado actual: " + cliente.getEstado());
+            return new LoginResponse(
+                    false,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false
+            );
+        }
+
+        boolean activoPagosMasivos = Boolean.TRUE.equals(cliente.getActivoPagosMasivos());
+
+        String nombre;
+        if (cliente.getTipoCliente() == TipoClienteEnum.JURIDICO) {
+            nombre = cliente.getRazonSocial();
+        } else {
+            nombre = cliente.getNombres() + " " + cliente.getApellidos();
+        }
+
+        System.out.println("Login exitoso para usuario: " + request.usuario());
+        return new LoginResponse(
+                true,
+                cliente.getTipoCliente() == TipoClienteEnum.JURIDICO ? "EMPRESA" : "PERSONA",
+                "CRED-" + credencial.getId(),
+                "CLI-" + cliente.getId(),
+                cliente.getIdentificacion(),
+                credencial.getUsuario(),
+                nombre,
+                "EMPRESA",
+                cliente.getEstado().name(),
+                activoPagosMasivos
         );
     }
 
