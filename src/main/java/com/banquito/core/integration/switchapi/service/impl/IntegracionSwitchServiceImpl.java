@@ -13,7 +13,12 @@ import com.banquito.core.customers.enums.TipoClienteEnum;
 import com.banquito.core.customers.enums.TipoIdentificacionEnum;
 import com.banquito.core.customers.model.Cliente;
 import com.banquito.core.customers.repository.ClienteRepository;
+<<<<<<< Updated upstream
 import com.banquito.core.integration.switchapi.dto.api.DiaHabilSwitchResponse;
+=======
+import com.banquito.core.accounts.repository.CuentaRepository;
+import com.banquito.core.integration.switchapi.dto.api.CuentaFavoritaPagosResponse;
+>>>>>>> Stashed changes
 import com.banquito.core.integration.switchapi.dto.api.LiquidacionServicioSwitchRequest;
 import com.banquito.core.integration.switchapi.dto.api.LiquidacionServicioSwitchResponse;
 import com.banquito.core.integration.switchapi.dto.api.ValidarCredencialEmpresaSwitchResponse;
@@ -50,7 +55,11 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
     private final ClienteRepository clienteRepository;
     private final CuentaRepository cuentaRepository;
     private final CuentaService cuentaService;
+<<<<<<< Updated upstream
     private final CredencialWebRepository credencialWebRepository;
+=======
+    private final CuentaRepository cuentaRepository;
+>>>>>>> Stashed changes
     private final TransaccionService transaccionService;
     private final FeriadoRepository feriadoRepository;
     private final FeriadoService feriadoService;
@@ -236,6 +245,76 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
                 username,
                 credencial,
                 perteneceEmpresa,
+                valida
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CuentaFavoritaPagosResponse consultarCuentaFavoritaPagos(String ruc) {
+        var clienteOptional = clienteRepository.findByTipoIdentificacionAndIdentificacion(
+                TipoIdentificacionEnum.RUC,
+                ruc
+        );
+
+        if (clienteOptional.isEmpty()) {
+            auditoriaService.registrarEvento(
+                    MODULO_INTEGRACION_SWITCH,
+                    "CONSULTAR_CUENTA_FAVORITA_PAGOS",
+                    "CLIENTE",
+                    ruc,
+                    ResultadoAuditoriaEnum.RECHAZADO,
+                    CanalOrigenEnum.SWITCH,
+                    "{\"rucEmpresa\":\"" + sanitizarJson(ruc) + "\",\"existe\":false,\"motivo\":\"NO_EXISTE\"}"
+            );
+
+            return IntegracionSwitchMapper.toCuentaFavoritaNoExisteResponse(ruc);
+        }
+
+        var cliente = clienteOptional.get();
+        var cuentaFavoritaOptional = cuentaRepository.findFirstByClienteIdAndEsFavoritaPagosTrue(cliente.getId());
+
+        if (cuentaFavoritaOptional.isEmpty()) {
+            auditoriaService.registrarEvento(
+                    MODULO_INTEGRACION_SWITCH,
+                    "CONSULTAR_CUENTA_FAVORITA_PAGOS",
+                    "CLIENTE",
+                    cliente.getId().toString(),
+                    ResultadoAuditoriaEnum.RECHAZADO,
+                    CanalOrigenEnum.SWITCH,
+                    "{\"rucEmpresa\":\"" + sanitizarJson(ruc) + "\",\"existe\":true,\"valida\":false,\"motivo\":\"NO_CUENTA_FAVORITA\"}"
+            );
+
+            return IntegracionSwitchMapper.toCuentaFavoritaNoEncontradaResponse(ruc);
+        }
+
+        var cuentaFavorita = cuentaFavoritaOptional.get();
+        boolean valida = cuentaFavorita.getEstado() == EstadoCuentaEnum.ACTIVA;
+        boolean permiteDebito = valida && cuentaFavorita.getSaldoDisponible().compareTo(java.math.BigDecimal.ZERO) >= 0;
+
+        auditoriaService.registrarEvento(
+                MODULO_INTEGRACION_SWITCH,
+                "CONSULTAR_CUENTA_FAVORITA_PAGOS",
+                "CUENTA",
+                cuentaFavorita.getId().toString(),
+                valida ? ResultadoAuditoriaEnum.EXITOSO : ResultadoAuditoriaEnum.RECHAZADO,
+                CanalOrigenEnum.SWITCH,
+                "{\"rucEmpresa\":\"" + sanitizarJson(ruc) +
+                        "\",\"numeroCuenta\":\"" + sanitizarJson(cuentaFavorita.getNumeroCuenta()) +
+                        "\",\"estado\":\"" + cuentaFavorita.getEstado() +
+                        "\",\"permiteDebito\":" + permiteDebito +
+                        ",\"saldoDisponible\":" + cuentaFavorita.getSaldoDisponible() +
+                        ",\"esFavoritaPagos\":" + cuentaFavorita.getEsFavoritaPagos() +
+                        ",\"valida\":" + valida + "}"
+        );
+
+        return IntegracionSwitchMapper.toCuentaFavoritaResponse(
+                ruc,
+                cuentaFavorita.getNumeroCuenta(),
+                cuentaFavorita.getEstado().name(),
+                permiteDebito,
+                cuentaFavorita.getSaldoDisponible(),
+                cuentaFavorita.getEsFavoritaPagos(),
                 valida
         );
     }

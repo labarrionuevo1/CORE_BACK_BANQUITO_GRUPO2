@@ -1,7 +1,11 @@
 package com.banquito.core.integration.switchapi.mapper;
 
+import java.time.LocalDate;
+import java.util.UUID;
+
 import com.banquito.core.accounts.enums.EstadoCuentaEnum;
 import com.banquito.core.accounts.model.Cuenta;
+import com.banquito.core.customers.enums.TipoClienteEnum;
 import com.banquito.core.customers.model.Cliente;
 import com.banquito.core.integration.switchapi.dto.api.DiaHabilSwitchResponse;
 import com.banquito.core.integration.switchapi.dto.api.LiquidacionServicioSwitchResponse;
@@ -10,9 +14,6 @@ import com.banquito.core.integration.switchapi.dto.api.ValidarCuentaDestinoSwitc
 import com.banquito.core.integration.switchapi.dto.api.ValidarCuentaMatrizSwitchResponse;
 import com.banquito.core.integration.switchapi.dto.api.ValidarEmpresaSwitchResponse;
 import com.banquito.core.security.model.CredencialWeb;
-
-import java.time.LocalDate;
-import java.util.UUID;
 
 public final class IntegracionSwitchMapper {
 
@@ -51,6 +52,61 @@ public final class IntegracionSwitchMapper {
                 Boolean.TRUE.equals(habilitada)
                         ? "Empresa habilitada para pagos masivos."
                         : "Empresa no habilitada para pagos masivos."
+        );
+    }
+
+    public static CuentaFavoritaPagosResponse toCuentaFavoritaResponse(
+            String rucEmpresa,
+            String numeroCuenta,
+            String estado,
+            Boolean permiteDebito,
+            java.math.BigDecimal saldoDisponible,
+            Boolean esFavoritaPagos,
+            Boolean valida
+    ) {
+        String codigo = valida ? "CUENTA_FAVORITA_VALIDA" : "CUENTA_FAVORITA_INVALIDA";
+        String mensaje = valida ? "Cuenta favorita valida para pagos masivos." : "Cuenta favorita no valida para pagos masivos.";
+        return new CuentaFavoritaPagosResponse(
+                rucEmpresa,
+                true,
+                numeroCuenta,
+                estado,
+                permiteDebito,
+                saldoDisponible,
+                esFavoritaPagos,
+                valida,
+                codigo,
+                mensaje
+        );
+    }
+
+    public static CuentaFavoritaPagosResponse toCuentaFavoritaNoExisteResponse(String rucEmpresa) {
+        return new CuentaFavoritaPagosResponse(
+                rucEmpresa,
+                false,
+                null,
+                null,
+                false,
+                null,
+                false,
+                false,
+                "CUENTA_FAVORITA_EMPRESA_NO_EXISTE",
+                "Empresa no existe o no tiene cuenta favorita para pagos masivos."
+        );
+    }
+
+    public static CuentaFavoritaPagosResponse toCuentaFavoritaNoEncontradaResponse(String rucEmpresa) {
+        return new CuentaFavoritaPagosResponse(
+                rucEmpresa,
+                true,
+                null,
+                null,
+                false,
+                null,
+                false,
+                false,
+                "CUENTA_FAVORITA_NO_ENCONTRADA",
+                "No se encontró cuenta favorita para pagos masivos."
         );
     }
 
@@ -127,6 +183,7 @@ public final class IntegracionSwitchMapper {
         return new ValidarCuentaDestinoSwitchResponse(
                 numeroCuenta,
                 identificacionBeneficiario,
+                null,
                 false,
                 false,
                 null,
@@ -149,6 +206,7 @@ public final class IntegracionSwitchMapper {
         return new ValidarCuentaDestinoSwitchResponse(
                 cuenta.getNumeroCuenta(),
                 identificacionBeneficiario,
+                resolverNombreBeneficiario(cuenta),
                 true,
                 Boolean.TRUE.equals(perteneceBeneficiario),
                 cuenta.getEstado(),
@@ -160,6 +218,22 @@ public final class IntegracionSwitchMapper {
                         ? "Cuenta destino valida para recibir pagos."
                         : "Cuenta destino no valida para recibir pagos."
         );
+    }
+
+    private static String resolverNombreBeneficiario(Cuenta cuenta) {
+        if (cuenta == null || cuenta.getCliente() == null) {
+            return null;
+        }
+
+        Cliente cliente = cuenta.getCliente();
+        if (cliente.getTipoCliente() == TipoClienteEnum.JURIDICO && cliente.getRazonSocial() != null) {
+            return cliente.getRazonSocial();
+        }
+
+        String nombres = cliente.getNombres() != null ? cliente.getNombres() : "";
+        String apellidos = cliente.getApellidos() != null ? cliente.getApellidos() : "";
+        String nombreCompleto = (nombres + " " + apellidos).trim();
+        return nombreCompleto.isBlank() ? null : nombreCompleto;
     }
 
     public static ValidarCredencialEmpresaSwitchResponse toCredencialEmpresaNoExisteResponse(

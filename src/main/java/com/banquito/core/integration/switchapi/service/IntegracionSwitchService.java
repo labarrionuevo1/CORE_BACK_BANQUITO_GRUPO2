@@ -1,6 +1,9 @@
 package com.banquito.core.integration.switchapi.service;
 
+import java.time.LocalDate;
+
 import com.banquito.core.accounts.dto.api.SaldoCuentaResponse;
+import com.banquito.core.integration.switchapi.dto.api.CuentaFavoritaPagosResponse;
 import com.banquito.core.integration.switchapi.dto.api.LiquidacionServicioSwitchRequest;
 import com.banquito.core.integration.switchapi.dto.api.LiquidacionServicioSwitchResponse;
 import com.banquito.core.integration.switchapi.dto.api.DiaHabilSwitchResponse;
@@ -10,8 +13,6 @@ import com.banquito.core.integration.switchapi.dto.api.ValidarCuentaDestinoSwitc
 import com.banquito.core.integration.switchapi.dto.api.ValidarCuentaMatrizSwitchResponse;
 import com.banquito.core.transactions.dto.api.TransferenciaRequest;
 import com.banquito.core.transactions.dto.api.TransferenciaResponse;
-
-import java.time.LocalDate;
 
 public interface IntegracionSwitchService {
 
@@ -24,6 +25,8 @@ public interface IntegracionSwitchService {
     ValidarCuentaDestinoSwitchResponse validarCuentaDestino(String numeroCuenta, String identificacionBeneficiario);
 
     SaldoCuentaResponse consultarDisponibilidad(String numeroCuenta);
+
+    CuentaFavoritaPagosResponse consultarCuentaFavoritaPagos(String ruc);
 
     TransferenciaResponse ejecutarTransferencia(TransferenciaRequest request);
 
