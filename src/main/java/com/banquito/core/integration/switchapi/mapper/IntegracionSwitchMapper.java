@@ -7,6 +7,7 @@ import com.banquito.core.accounts.enums.EstadoCuentaEnum;
 import com.banquito.core.accounts.model.Cuenta;
 import com.banquito.core.customers.enums.TipoClienteEnum;
 import com.banquito.core.customers.model.Cliente;
+import com.banquito.core.integration.switchapi.dto.api.CuentaFavoritaPagosResponse;
 import com.banquito.core.integration.switchapi.dto.api.DiaHabilSwitchResponse;
 import com.banquito.core.integration.switchapi.dto.api.LiquidacionServicioSwitchResponse;
 import com.banquito.core.integration.switchapi.dto.api.ValidarCredencialEmpresaSwitchResponse;
@@ -62,7 +63,8 @@ public final class IntegracionSwitchMapper {
             Boolean permiteDebito,
             java.math.BigDecimal saldoDisponible,
             Boolean esFavoritaPagos,
-            Boolean valida
+            Boolean valida,
+            String nombreBeneficiario
     ) {
         String codigo = valida ? "CUENTA_FAVORITA_VALIDA" : "CUENTA_FAVORITA_INVALIDA";
         String mensaje = valida ? "Cuenta favorita valida para pagos masivos." : "Cuenta favorita no valida para pagos masivos.";
@@ -75,6 +77,7 @@ public final class IntegracionSwitchMapper {
                 saldoDisponible,
                 esFavoritaPagos,
                 valida,
+                nombreBeneficiario,
                 codigo,
                 mensaje
         );
@@ -90,6 +93,7 @@ public final class IntegracionSwitchMapper {
                 null,
                 false,
                 false,
+                null,
                 "CUENTA_FAVORITA_EMPRESA_NO_EXISTE",
                 "Empresa no existe o no tiene cuenta favorita para pagos masivos."
         );
@@ -105,6 +109,7 @@ public final class IntegracionSwitchMapper {
                 null,
                 false,
                 false,
+                null,
                 "CUENTA_FAVORITA_NO_ENCONTRADA",
                 "No se encontró cuenta favorita para pagos masivos."
         );
@@ -220,7 +225,7 @@ public final class IntegracionSwitchMapper {
         );
     }
 
-    private static String resolverNombreBeneficiario(Cuenta cuenta) {
+    public static String resolverNombreBeneficiario(Cuenta cuenta) {
         if (cuenta == null || cuenta.getCliente() == null) {
             return null;
         }

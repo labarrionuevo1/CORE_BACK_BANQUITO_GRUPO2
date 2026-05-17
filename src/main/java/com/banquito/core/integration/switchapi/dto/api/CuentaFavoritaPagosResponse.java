@@ -11,6 +11,7 @@ public record CuentaFavoritaPagosResponse(
         BigDecimal saldoDisponible,
         Boolean esFavoritaPagos,
         Boolean valida,
+        String nombreBeneficiario,
         String codigo,
         String mensaje
 ) {

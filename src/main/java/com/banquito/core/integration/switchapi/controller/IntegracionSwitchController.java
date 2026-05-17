@@ -52,6 +52,11 @@ public class IntegracionSwitchController {
         );
     }
 
+    @GetMapping("/empresas/{ruc}/cuenta-favorita-pagos")
+    public Object consultarCuentaFavoritaPagos(@PathVariable String ruc) {
+        return service.consultarCuentaFavoritaPagos(ruc);
+    }
+
     @GetMapping("/cuentas/{numeroCuenta}/disponibilidad")
     public ApiResponse<?> disponibilidad(@PathVariable String numeroCuenta) {
         return ApiResponse.ok("Disponibilidad de cuenta", service.consultarDisponibilidad(numeroCuenta));
