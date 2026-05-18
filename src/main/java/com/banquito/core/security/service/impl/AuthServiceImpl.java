@@ -30,7 +30,7 @@ public class AuthServiceImpl implements AuthService {
     private static final String MODULO_SEGURIDAD = "SEGURIDAD";
     private static final String ACCION_LOGIN = "LOGIN";
     private static final String ACCION_LOGIN_PAGOS_MASIVOS = "LOGIN_PAGOS_MASIVOS";
-    private static final String MENSAJE_CREDENCIALES_INVALIDAS = "Usuario o contrasena incorrectos";
+    private static final String MENSAJE_CREDENCIALES_INVALIDAS = "Credenciales inválidas";
 
     private final CredencialWebRepository credencialWebRepository;
     private final UsuarioCoreRepository usuarioCoreRepository;

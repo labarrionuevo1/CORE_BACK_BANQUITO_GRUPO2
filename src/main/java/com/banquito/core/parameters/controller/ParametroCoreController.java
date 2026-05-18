@@ -19,6 +19,11 @@ public class ParametroCoreController {
         return ApiResponse.ok("Parámetros obtenidos", service.listar());
     }
 
+    @GetMapping("/activos")
+    public ApiResponse<?> listarActivos() {
+        return ApiResponse.ok("Parámetros activos obtenidos", service.listarActivos());
+    }
+
     @GetMapping("/{codigo}")
     public ApiResponse<?> obtener(@PathVariable String codigo) {
         return ApiResponse.ok("Parámetro obtenido", service.obtener(codigo));

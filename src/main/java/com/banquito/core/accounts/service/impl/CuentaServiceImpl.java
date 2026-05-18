@@ -31,6 +31,7 @@ import com.banquito.core.notifications.mapper.NotificacionMapper;
 import com.banquito.core.notifications.service.NotificacionService;
 import com.banquito.core.security.repository.UsuarioCoreRepository;
 import com.banquito.core.shared.enums.CanalOrigenEnum;
+import com.banquito.core.shared.exception.BusinessException;
 import com.banquito.core.shared.exception.ResourceNotFoundException;
 import com.banquito.core.shared.exception.ValidationException;
 
@@ -229,7 +230,7 @@ public class CuentaServiceImpl implements CuentaService {
                 .orElseThrow(() -> new ResourceNotFoundException("Bloqueo no encontrado: " + idBloqueo));
 
         if (bloqueo.getEstado() != EstadoBloqueoCuentaEnum.ACTIVO) {
-            throw new ValidationException("El bloqueo ya fue liberado o no está activo");
+            throw new BusinessException("El bloqueo ya fue liberado o no esta activo");
         }
 
         Cuenta cuenta = bloqueo.getCuenta();

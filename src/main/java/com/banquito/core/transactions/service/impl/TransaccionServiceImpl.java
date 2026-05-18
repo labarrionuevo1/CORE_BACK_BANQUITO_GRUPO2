@@ -78,9 +78,9 @@ public class TransaccionServiceImpl implements TransaccionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public TransferenciaResponse ejecutarTransferencia(TransferenciaRequest request) {
-        log.info("Iniciando transferencia: origen={}, destino={}, monto={}", 
+        log.info("Iniciando transferencia: origen={}, destino={}, monto={}",
                 request.cuentaOrigen(), request.cuentaDestino(), request.monto());
-        
+
         try {
             TransferenciaResponse response = ejecutarTransferenciaInterna(request);
             entityManager.flush();
@@ -92,7 +92,7 @@ public class TransaccionServiceImpl implements TransaccionService {
             if (TransactionAspectSupport.currentTransactionStatus() != null) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             }
-            
+
             CanalOrigenEnum canalOrigen = resolverCanalOrigen(request);
 
             auditoriaService.registrarEventoNuevaTransaccion(
@@ -399,7 +399,7 @@ public class TransaccionServiceImpl implements TransaccionService {
     private String sanitizarIdentificadorParaBusqueda(String identificador) {
         String resultado = identificador;
         if (resultado.startsWith("TRF-") || resultado.startsWith("CRE-") ||
-            resultado.startsWith("DEB-") || resultado.startsWith("BQ-")) {
+                resultado.startsWith("DEB-") || resultado.startsWith("BQ-")) {
             resultado = resultado.substring(4);
         }
         return resultado.toLowerCase();
@@ -416,24 +416,52 @@ public class TransaccionServiceImpl implements TransaccionService {
             );
         }
 
-        if (destino.getEstado() == EstadoCuentaEnum.SUSPENDIDA) {
+        if (destino.getEstado() != EstadoCuentaEnum.ACTIVA) {
             throw new AccountNotActiveException(
-                    "Cuenta destino esta suspendida: " + request.cuentaDestino()
+                    "Cuenta destino no permite recibir transferencias en estado "
+                            + destino.getEstado() + ": " + request.cuentaDestino()
             );
         }
     }
 
     private void validarSaldoDisponible(Cuenta cuenta, BigDecimal monto) {
-        BigDecimal limiteSobregiro = Boolean.TRUE.equals(cuenta.getPermiteSobregiro()) && cuenta.getLimiteSobregiro() != null
+        if (monto == null || monto.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new ValidationException("El monto de la transferencia debe ser mayor a cero");
+        }
+
+        BigDecimal saldoDisponible = cuenta.getSaldoDisponible() != null
+                ? cuenta.getSaldoDisponible()
+                : BigDecimal.ZERO;
+
+        if (saldoDisponible.compareTo(monto) >= 0) {
+            return;
+        }
+
+        if (!Boolean.TRUE.equals(cuenta.getPermiteSobregiro())) {
+            throw new InsufficientFundsException(
+                    "Saldo insuficiente en cuenta " + cuenta.getNumeroCuenta() +
+                            ". Disponible: " + saldoDisponible +
+                            ", Monto: " + monto
+            );
+        }
+
+        BigDecimal limiteSobregiro = cuenta.getLimiteSobregiro() != null
                 ? cuenta.getLimiteSobregiro()
                 : BigDecimal.ZERO;
 
-        BigDecimal saldoConSobregiro = cuenta.getSaldoDisponible().add(limiteSobregiro);
-
-        if (saldoConSobregiro.compareTo(monto) < 0) {
+        if (limiteSobregiro.compareTo(BigDecimal.ZERO) <= 0) {
             throw new InsufficientFundsException(
-                    "Saldo insuficiente en cuenta " + cuenta.getNumeroCuenta() +
-                            ". Disponible: " + cuenta.getSaldoDisponible() +
+                    "La cuenta " + cuenta.getNumeroCuenta() + " no tiene limite de sobregiro disponible"
+            );
+        }
+
+        BigDecimal sobregiroResultante = monto.subtract(saldoDisponible);
+
+        if (sobregiroResultante.compareTo(limiteSobregiro) > 0) {
+            throw new InsufficientFundsException(
+                    "La transferencia excede el limite de sobregiro de la cuenta " + cuenta.getNumeroCuenta() +
+                            ". Disponible: " + saldoDisponible +
+                            ", LimiteSobregiro: " + limiteSobregiro +
                             ", Monto: " + monto
             );
         }
