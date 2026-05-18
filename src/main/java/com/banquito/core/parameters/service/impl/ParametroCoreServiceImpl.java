@@ -36,6 +36,12 @@ public class ParametroCoreServiceImpl implements ParametroCoreService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<ParametroCoreResponse> listarActivos() {
+        return listar();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public ParametroCoreResponse obtener(String codigo) {
         return repository.findById(codigo)
                 .map(ParametroMapper::toResponse)

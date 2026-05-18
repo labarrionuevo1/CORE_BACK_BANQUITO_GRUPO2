@@ -29,7 +29,6 @@ import com.banquito.core.parameters.repository.FeriadoRepository;
 import com.banquito.core.parameters.service.FeriadoService;
 import com.banquito.core.security.enums.EstadoCredencialWebEnum;
 import com.banquito.core.security.repository.CredencialWebRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import com.banquito.core.shared.enums.CanalOrigenEnum;
 import com.banquito.core.shared.exception.ValidationException;
 import com.banquito.core.transactions.dto.api.TransferenciaRequest;
@@ -37,6 +36,7 @@ import com.banquito.core.transactions.dto.api.TransferenciaResponse;
 import com.banquito.core.transactions.enums.TipoMovimientoEnum;
 import com.banquito.core.transactions.service.TransaccionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +50,10 @@ import java.util.UUID;
 public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
 
     private static final String MODULO_INTEGRACION_SWITCH = "INTEGRATION_SWITCH";
+    private static final String ACCION_VALIDAR_EMPRESA = "VALIDAR_EMPRESA";
+    private static final String ACCION_CONSULTAR_CUENTA_FAVORITA = "CONSULTAR_CUENTA_FAVORITA_PAGOS";
+    private static final String ACCION_LOGIN_SWITCH = "LOGIN_SWITCH";
+    private static final String ACCION_LIQUIDAR_COMISION_IVA = "LIQUIDAR_COMISION_IVA";
 
     private final ClienteRepository clienteRepository;
     private final CuentaRepository cuentaRepository;
@@ -72,7 +76,7 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
         if (clienteOptional.isEmpty()) {
             auditoriaService.registrarEvento(
                     MODULO_INTEGRACION_SWITCH,
-                    "VALIDAR_EMPRESA",
+                    ACCION_VALIDAR_EMPRESA,
                     "CLIENTE",
                     ruc,
                     ResultadoAuditoriaEnum.RECHAZADO,
@@ -97,7 +101,7 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
 
         auditoriaService.registrarEvento(
                 MODULO_INTEGRACION_SWITCH,
-                "VALIDAR_EMPRESA",
+                ACCION_VALIDAR_EMPRESA,
                 "CLIENTE",
                 cliente.getId().toString(),
                 habilitada ? ResultadoAuditoriaEnum.EXITOSO : ResultadoAuditoriaEnum.RECHAZADO,
@@ -233,6 +237,7 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
 
         boolean valida = perteneceEmpresa
                 && credencial.getEstado() == EstadoCredencialWebEnum.ACTIVO
+                && empresa.getTipoCliente() == TipoClienteEnum.JURIDICO
                 && empresa.getEstado() == EstadoClienteEnum.ACTIVO
                 && Boolean.TRUE.equals(empresa.getActivoPagosMasivos());
 
@@ -244,7 +249,6 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
                 valida
         );
     }
-
 
     @Override
     @Transactional(readOnly = true)
@@ -265,7 +269,7 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
         if (clienteOptional.isEmpty()) {
             auditoriaService.registrarEvento(
                     MODULO_INTEGRACION_SWITCH,
-                    "CONSULTAR_CUENTA_FAVORITA_PAGOS",
+                    ACCION_CONSULTAR_CUENTA_FAVORITA,
                     "CLIENTE",
                     ruc,
                     ResultadoAuditoriaEnum.RECHAZADO,
@@ -282,12 +286,13 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
         if (cuentaFavoritaOptional.isEmpty()) {
             auditoriaService.registrarEvento(
                     MODULO_INTEGRACION_SWITCH,
-                    "CONSULTAR_CUENTA_FAVORITA_PAGOS",
+                    ACCION_CONSULTAR_CUENTA_FAVORITA,
                     "CLIENTE",
                     cliente.getId().toString(),
                     ResultadoAuditoriaEnum.RECHAZADO,
                     CanalOrigenEnum.SWITCH,
-                    "{\"rucEmpresa\":\"" + sanitizarJson(ruc) + "\",\"existe\":true,\"valida\":false,\"motivo\":\"NO_CUENTA_FAVORITA\"}"
+                    "{\"rucEmpresa\":\"" + sanitizarJson(ruc) +
+                            "\",\"existe\":true,\"valida\":false,\"motivo\":\"NO_CUENTA_FAVORITA\"}"
             );
 
             return IntegracionSwitchMapper.toCuentaFavoritaNoEncontradaResponse(ruc);
@@ -295,12 +300,15 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
 
         var cuentaFavorita = cuentaFavoritaOptional.get();
         boolean valida = cuentaFavorita.getEstado() == EstadoCuentaEnum.ACTIVA;
-        boolean permiteDebito = valida && cuentaFavorita.getSaldoDisponible().compareTo(java.math.BigDecimal.ZERO) >= 0;
+        boolean permiteDebito = valida
+                && cuentaFavorita.getSaldoDisponible() != null
+                && cuentaFavorita.getSaldoDisponible().compareTo(BigDecimal.ZERO) >= 0;
+
         String nombreBeneficiario = IntegracionSwitchMapper.resolverNombreBeneficiario(cuentaFavorita);
 
         auditoriaService.registrarEvento(
                 MODULO_INTEGRACION_SWITCH,
-                "CONSULTAR_CUENTA_FAVORITA_PAGOS",
+                ACCION_CONSULTAR_CUENTA_FAVORITA,
                 "CUENTA",
                 cuentaFavorita.getId().toString(),
                 valida ? ResultadoAuditoriaEnum.EXITOSO : ResultadoAuditoriaEnum.RECHAZADO,
@@ -327,117 +335,124 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public LoginResponse login(LoginRequest request) {
-        System.out.println("Intentando login para usuario: " + request.usuario());
+        if (request == null || esTextoVacio(request.usuario()) || esTextoVacio(request.contrasena())) {
+            registrarLoginSwitch(
+                    null,
+                    "AUTENTICACION_SWITCH",
+                    "N/A",
+                    ResultadoAuditoriaEnum.RECHAZADO,
+                    "REQUEST_INVALIDO"
+            );
+            return loginFallido();
+        }
 
-        var credencialOptional = credencialWebRepository.findByUsuario(request.usuario());
+        String usuario = request.usuario().trim();
+
+        var credencialOptional = credencialWebRepository.findByUsuario(usuario);
 
         if (credencialOptional.isEmpty()) {
-            System.out.println("Credencial no encontrada para usuario: " + request.usuario());
-            return new LoginResponse(
-                    false,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    false
+            registrarLoginSwitch(
+                    usuario,
+                    "CREDENCIAL_WEB",
+                    usuario,
+                    ResultadoAuditoriaEnum.RECHAZADO,
+                    "CREDENCIAL_NO_EXISTE"
             );
+            return loginFallido();
         }
 
         var credencial = credencialOptional.get();
-        System.out.println("Credencial encontrada. ID: " + credencial.getId() + ", Estado: " + credencial.getEstado());
 
-        if (!passwordEncoder.matches(request.contraseña(), credencial.getPasswordHash())) {
-            System.out.println("Contraseña incorrecta para usuario: " + request.usuario());
-            return new LoginResponse(
-                    false,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    false
+        if (esTextoVacio(credencial.getPasswordHash())
+                || !passwordEncoder.matches(request.contrasena(), credencial.getPasswordHash())) {
+            registrarLoginSwitch(
+                    usuario,
+                    "CREDENCIAL_WEB",
+                    credencial.getId().toString(),
+                    ResultadoAuditoriaEnum.RECHAZADO,
+                    "CREDENCIALES_INVALIDAS"
             );
+            return loginFallido();
         }
 
         if (credencial.getEstado() != EstadoCredencialWebEnum.ACTIVO) {
-            System.out.println("Credencial no está ACTIVA. Estado actual: " + credencial.getEstado());
-            return new LoginResponse(
-                    false,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    false
+            registrarLoginSwitch(
+                    usuario,
+                    "CREDENCIAL_WEB",
+                    credencial.getId().toString(),
+                    ResultadoAuditoriaEnum.RECHAZADO,
+                    "CREDENCIAL_INACTIVA"
             );
+            return loginFallido();
         }
 
         Cliente cliente = credencial.getCliente();
+
         if (cliente == null) {
-            System.out.println("Cliente es null para credencial ID: " + credencial.getId());
-            return new LoginResponse(
-                    false,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    false
+            registrarLoginSwitch(
+                    usuario,
+                    "CREDENCIAL_WEB",
+                    credencial.getId().toString(),
+                    ResultadoAuditoriaEnum.RECHAZADO,
+                    "CLIENTE_NO_ASOCIADO"
             );
+            return loginFallido();
+        }
+
+        if (cliente.getTipoCliente() != TipoClienteEnum.JURIDICO) {
+            registrarLoginSwitch(
+                    usuario,
+                    "CLIENTE",
+                    cliente.getId().toString(),
+                    ResultadoAuditoriaEnum.RECHAZADO,
+                    "CLIENTE_NO_JURIDICO"
+            );
+            return loginFallido();
         }
 
         if (cliente.getEstado() != EstadoClienteEnum.ACTIVO) {
-            System.out.println("Cliente no está ACTIVO. Estado actual: " + cliente.getEstado());
-            return new LoginResponse(
-                    false,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    false
+            registrarLoginSwitch(
+                    usuario,
+                    "CLIENTE",
+                    cliente.getId().toString(),
+                    ResultadoAuditoriaEnum.RECHAZADO,
+                    "CLIENTE_INACTIVO"
             );
+            return loginFallido();
         }
 
-        boolean activoPagosMasivos = Boolean.TRUE.equals(cliente.getActivoPagosMasivos());
-
-        String nombre;
-        if (cliente.getTipoCliente() == TipoClienteEnum.JURIDICO) {
-            nombre = cliente.getRazonSocial();
-        } else {
-            nombre = cliente.getNombres() + " " + cliente.getApellidos();
+        if (!Boolean.TRUE.equals(cliente.getActivoPagosMasivos())) {
+            registrarLoginSwitch(
+                    usuario,
+                    "CLIENTE",
+                    cliente.getId().toString(),
+                    ResultadoAuditoriaEnum.RECHAZADO,
+                    "EMPRESA_NO_HABILITADA_PAGOS_MASIVOS"
+            );
+            return loginFallido();
         }
 
-        System.out.println("Login exitoso para usuario: " + request.usuario());
+        registrarLoginSwitch(
+                usuario,
+                "CLIENTE",
+                cliente.getId().toString(),
+                ResultadoAuditoriaEnum.EXITOSO,
+                "LOGIN_EXITOSO"
+        );
+
         return new LoginResponse(
                 true,
-                cliente.getTipoCliente() == TipoClienteEnum.JURIDICO ? "EMPRESA" : "PERSONA",
-                "CRED-" + credencial.getId(),
-                "CLI-" + cliente.getId(),
+                "EMPRESA",
+                String.valueOf(credencial.getId()),
+                String.valueOf(cliente.getId()),
                 cliente.getIdentificacion(),
                 credencial.getUsuario(),
-                nombre,
+                resolverNombreCliente(cliente),
                 "EMPRESA",
                 cliente.getEstado().name(),
-                activoPagosMasivos
+                true
         );
     }
 
@@ -484,7 +499,7 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
 
         auditoriaService.registrarEvento(
                 MODULO_INTEGRACION_SWITCH,
-                "LIQUIDAR_COMISION_IVA",
+                ACCION_LIQUIDAR_COMISION_IVA,
                 "LIQUIDACION_SERVICIO",
                 request.uuidGrupoOperacion().toString(),
                 ResultadoAuditoriaEnum.EXITOSO,
@@ -554,6 +569,59 @@ public class IntegracionSwitchServiceImpl implements IntegracionSwitchService {
         if (totalCalculado.compareTo(request.totalDebitado()) != 0) {
             throw new ValidationException("El total debitado debe ser igual a subtotalComision + montoIva");
         }
+    }
+
+    private LoginResponse loginFallido() {
+        return new LoginResponse(
+                false,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                false
+        );
+    }
+
+    private void registrarLoginSwitch(
+            String usuario,
+            String entidad,
+            String entidadId,
+            ResultadoAuditoriaEnum resultado,
+            String motivo
+    ) {
+        auditoriaService.registrarEvento(
+                MODULO_INTEGRACION_SWITCH,
+                ACCION_LOGIN_SWITCH,
+                entidad,
+                entidadId,
+                resultado,
+                CanalOrigenEnum.SWITCH,
+                "{\"usuario\":\"" + sanitizarJson(usuario) +
+                        "\",\"motivo\":\"" + sanitizarJson(motivo) + "\"}"
+        );
+    }
+
+    private String resolverNombreCliente(Cliente cliente) {
+        if (cliente == null) {
+            return null;
+        }
+
+        if (cliente.getTipoCliente() == TipoClienteEnum.JURIDICO) {
+            return cliente.getRazonSocial();
+        }
+
+        String nombres = cliente.getNombres() == null ? "" : cliente.getNombres().trim();
+        String apellidos = cliente.getApellidos() == null ? "" : cliente.getApellidos().trim();
+
+        return (nombres + " " + apellidos).trim();
+    }
+
+    private boolean esTextoVacio(String valor) {
+        return valor == null || valor.isBlank();
     }
 
     private String sanitizarJson(String valor) {

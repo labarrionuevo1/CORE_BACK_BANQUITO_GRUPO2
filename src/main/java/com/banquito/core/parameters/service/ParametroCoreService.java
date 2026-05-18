@@ -9,6 +9,8 @@ public interface ParametroCoreService {
 
     List<ParametroCoreResponse> listar();
 
+    List<ParametroCoreResponse> listarActivos();
+
     ParametroCoreResponse obtener(String codigo);
 
     ParametroCoreResponse crear(ParametroCoreRequest request);
