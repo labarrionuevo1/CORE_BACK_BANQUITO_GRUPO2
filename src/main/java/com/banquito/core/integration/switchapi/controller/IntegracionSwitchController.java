@@ -62,11 +62,8 @@ public class IntegracionSwitchController {
     }
 
     @PostMapping("/autenticacion/login")
-    public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        return ApiResponse.ok(
-                "Autenticación Switch procesada",
-                service.login(request)
-        );
+    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
+        return service.login(request);
     }
 
     @GetMapping("/cuentas/{numeroCuenta}/disponibilidad")
